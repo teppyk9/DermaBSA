@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center">
+
+    <TextView
+        android:id="@+id/text_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DermaBSA"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/text_subtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stima superficie corporea coinvolta"
+        android:textSize="14sp"
+        android:layout_marginBottom="48dp"/>
+
+    <TextView
+        android:id="@+id/text_bsa_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nessuna misurazione"
+        android:textSize="20sp"
+        android:layout_marginBottom="48dp"/>
+
+    <Button
+        android:id="@+id/button_seleziona_distretto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleziona distretto"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/button_nuova_sessione"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nuova sessione"
+        style="@style/Widget.AppCompat.Button.Borderless"/>
+
+</LinearLayout>
