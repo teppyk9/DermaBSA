@@ -3,46 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:padding="16dp"
     android:gravity="center">
 
     <TextView
-        android:id="@+id/text_title"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvTotalBsa"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="DermaBSA"
-        android:textSize="32sp"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:id="@+id/text_subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stima superficie corporea coinvolta"
-        android:textSize="14sp"
-        android:layout_marginBottom="48dp"/>
-
-    <TextView
-        android:id="@+id/text_bsa_total"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Nessuna misurazione"
-        android:textSize="20sp"
-        android:layout_marginBottom="48dp"/>
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="BSA Totale: 0.00%" />
 
     <Button
-        android:id="@+id/button_seleziona_distretto"
+        android:id="@+id/btnCamera"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Seleziona distretto"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginTop="16dp"
+        android:text="Scatta foto" />
 
     <Button
-        android:id="@+id/button_nuova_sessione"
+        android:id="@+id/btnReset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nuova sessione"
-        style="@style/Widget.AppCompat.Button.Borderless"/>
+        android:layout_marginTop="8dp"
+        android:text="Nuova sessione" />
 
 </LinearLayout>
