@@ -124,7 +124,7 @@ class SelectionFragment : Fragment() {
 
         executor.execute {
             val mask = OnnxHelper.segmentWithMask(cropped, selectionMask)
-            val bsa  = OnnxHelper.calcBsa(mask, regionBsaPercent)
+            val bsa  = OnnxHelper.calcBsa(mask, regionBsaPercent) * viewModel.overlapRatio.value
             viewModel.setLastCapture(cropped, mask, bsa)
             requireActivity().runOnUiThread {
                 binding.btnAnalyze.isEnabled    = true

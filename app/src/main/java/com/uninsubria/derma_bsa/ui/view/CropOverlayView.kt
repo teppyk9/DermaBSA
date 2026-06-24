@@ -101,7 +101,12 @@ class CropOverlayView @JvmOverloads constructor(
         if (width == 0 || height == 0) return
         overlayMatrix.reset()
         val refRect = if (imageRect.isEmpty) RectF(0f, 0f, width.toFloat(), height.toFloat()) else imageRect
-        val s  = minOf(refRect.width(), refRect.height()) * 0.45f
+        val s = when (regionId) {
+            "arm_left", "arm_right", "leg_left", "leg_right" ->
+                maxOf(refRect.width(), refRect.height()) * 0.62f
+            else ->
+                minOf(refRect.width(), refRect.height()) * 0.45f
+        }
         val cx = refRect.centerX()
         val cy = refRect.centerY()
         overlayMatrix.postScale(s, s)
@@ -180,10 +185,12 @@ class CropOverlayView @JvmOverloads constructor(
      *
      * Mappa il path dal sistema di coordinate della View a quello dell'immagine originale,
      * applica il path come clip e disegna l'immagine su un nuovo Bitmap.
+     * Restituisce anche l'overlap ratio: la frazione della sagoma che cade dentro
+     * i bordi dell'immagine (es. 0.5 se solo metà sagoma è visibile nella foto).
      *
-     * @return il bitmap ritagliato, oppure `null` se non c'è un'immagine caricata
+     * @return coppia (bitmap ritagliato, overlapRatio 0..1), oppure `null` se non c'è immagine
      */
-    fun cropImage(): Bitmap? {
+    fun cropImage(): Pair<Bitmap, Float>? {
         val img = image ?: return null
         if (imageRect.isEmpty) return null
 
@@ -201,9 +208,16 @@ class CropOverlayView @JvmOverloads constructor(
         val imagePath = Path()
         viewPath.transform(viewToImage, imagePath)
 
-        val bounds = RectF()
-        imagePath.computeBounds(bounds, true)
-        bounds.intersect(0f, 0f, img.width.toFloat(), img.height.toFloat())
+        val fullBounds = RectF()
+        imagePath.computeBounds(fullBounds, true)
+
+        val bounds = RectF(fullBounds)
+        val hasOverlap = bounds.intersect(0f, 0f, img.width.toFloat(), img.height.toFloat())
+        if (!hasOverlap || bounds.isEmpty) return null
+
+        val fullArea    = fullBounds.width() * fullBounds.height()
+        val clippedArea = bounds.width() * bounds.height()
+        val overlapRatio = if (fullArea > 0f) (clippedArea / fullArea).coerceIn(0f, 1f) else 1f
 
         val cropW  = bounds.width().toInt().coerceAtLeast(1)
         val cropH  = bounds.height().toInt().coerceAtLeast(1)
@@ -212,7 +226,7 @@ class CropOverlayView @JvmOverloads constructor(
         canvas.translate(-bounds.left, -bounds.top)
         canvas.clipPath(imagePath)
         canvas.drawBitmap(img, 0f, 0f, null)
-        return result
+        return Pair(result, overlapRatio)
     }
 
     /**
@@ -230,13 +244,13 @@ class CropOverlayView @JvmOverloads constructor(
             addRoundRect(RectF(-0.375f, -0.5f, 0.375f, 0.5f), 0.08f, 0.08f, Path.Direction.CW)
         }
         "arm_left", "arm_right"     -> Path().apply {
-            addRoundRect(RectF(-0.15f, -0.5f, 0.15f, 0.5f), 0.08f, 0.08f, Path.Direction.CW)
+            addRoundRect(RectF(-0.09f, -0.5f, 0.09f, 0.5f), 0.06f, 0.06f, Path.Direction.CW)
         }
         "genitals"                  -> Path().apply {
             addRoundRect(RectF(-0.5f, -0.25f, 0.5f, 0.25f), 0.1f, 0.1f, Path.Direction.CW)
         }
         "leg_left", "leg_right"     -> Path().apply {
-            addRoundRect(RectF(-0.105f, -0.5f, 0.105f, 0.5f), 0.06f, 0.06f, Path.Direction.CW)
+            addRoundRect(RectF(-0.065f, -0.5f, 0.065f, 0.5f), 0.04f, 0.04f, Path.Direction.CW)
         }
         else                        -> Path().apply {
             addRoundRect(RectF(-0.5f, -0.5f, 0.5f, 0.5f), 0.1f, 0.1f, Path.Direction.CW)

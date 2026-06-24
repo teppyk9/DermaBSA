@@ -51,12 +51,14 @@ class CropFragment : Fragment() {
         }
 
         binding.btnCropConfirm.setOnClickListener {
-            val cropped = binding.cropOverlayView.cropImage()
-            if (cropped == null) {
+            val cropResult = binding.cropOverlayView.cropImage()
+            if (cropResult == null) {
                 Toast.makeText(requireContext(), "Ritaglio non riuscito", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            val (cropped, overlapRatio) = cropResult
             viewModel.setCroppedBitmap(cropped)
+            viewModel.setOverlapRatio(overlapRatio)
             viewModel.setSelectionMask(null)
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, SelectionFragment())

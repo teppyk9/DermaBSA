@@ -46,7 +46,9 @@ class ResultFragment : Fragment() {
 
         if (original != null && mask != null) {
             binding.imgOriginal.setImageBitmap(creaOverlay(original, mask))
-            binding.imgMask.setImageBitmap(mask)
+            binding.imgMask.setImageBitmap(
+                Bitmap.createScaledBitmap(mask, original.width, original.height, true)
+            )
         }
 
         binding.tvBsa.text = "BSA distretto: ${"%.2f".format(bsa)}%"

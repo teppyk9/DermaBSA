@@ -64,6 +64,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val croppedBitmap: StateFlow<Bitmap?> = _croppedBitmap
 
     /**
+     * Frazione della sagoma anatomica che cade dentro i bordi della foto (0..1).
+     * Vale 1 quando la sagoma è interamente nella foto; meno di 1 quando l'utente
+     * ha posizionato la sagoma in modo che parte di essa cada fuori dall'immagine
+     * (es. foto di dettaglio di mezza gamba).
+     */
+    private val _overlapRatio = MutableStateFlow(1f)
+    val overlapRatio: StateFlow<Float> = _overlapRatio
+
+    /**
      * Maschera disegnata manualmente dall'utente con il pennello.
      * Se `null`, la segmentazione viene eseguita sull'intera immagine (auto detect).
      */
@@ -192,6 +201,10 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _croppedBitmap.value = bmp
     }
 
+    fun setOverlapRatio(ratio: Float) {
+        _overlapRatio.value = ratio
+    }
+
     /**
      * Salva la maschera di selezione manuale disegnata dall'utente.
      * Passare `null` equivale a scegliere il rilevamento automatico.
@@ -263,6 +276,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         _lastBsa.value = 0f
         _selectedRegion.value = null
         _croppedBitmap.value = null
+        _overlapRatio.value = 1f
         _selectionMask.value = null
     }
 }
