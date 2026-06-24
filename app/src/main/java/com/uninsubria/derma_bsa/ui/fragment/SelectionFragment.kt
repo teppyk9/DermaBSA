@@ -50,6 +50,7 @@ class SelectionFragment : Fragment() {
             return
         }
         binding.ivCroppedPreview.setImageBitmap(cropped)
+        binding.selectionCanvas.setImageBitmap(cropped)
 
         configuraTool()
         configuraSeekBar()
@@ -100,6 +101,7 @@ class SelectionFragment : Fragment() {
         binding.seekBrushSize.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar, progress: Int, fromUser: Boolean) {
                 binding.selectionCanvas.brushSize = (progress + 10).toFloat()
+                if (fromUser) binding.selectionCanvas.previewCursor()
             }
             override fun onStartTrackingTouch(sb: SeekBar) {}
             override fun onStopTrackingTouch(sb: SeekBar) {}

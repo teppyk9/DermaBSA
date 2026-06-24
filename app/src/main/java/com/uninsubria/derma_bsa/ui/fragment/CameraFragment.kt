@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -120,11 +121,16 @@ class CameraFragment : Fragment() {
         binding.btnCapture.isEnabled = false
         capture.takePicture(cameraExecutor, object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
-                val bitmap = image.toBitmap()
+                val bitmap  = image.toBitmap()
+                val degrees = image.imageInfo.rotationDegrees
                 image.close()
+                val finalBitmap = if (degrees != 0) {
+                    val matrix = Matrix().apply { postRotate(degrees.toFloat()) }
+                    Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                } else bitmap
                 requireActivity().runOnUiThread {
                     binding.btnCapture.isEnabled = true
-                    navigateToCrop(bitmap)
+                    navigateToCrop(finalBitmap)
                 }
             }
 

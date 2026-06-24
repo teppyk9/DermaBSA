@@ -86,7 +86,7 @@ object OnnxHelper {
         output.close()
 
         val outPx = IntArray(size * size) { i ->
-            if (sigmoid(raw[i / size][i % size]) > 0.5f) 0x99FF0000.toInt() else 0x00000000
+            if (sigmoid(raw[i / size][i % size]) > 0.5f) 0x77FF0000.toInt() else 0x00000000
         }
         val mask = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         mask.setPixels(outPx, 0, size, 0, 0, size, size)
