@@ -5,19 +5,32 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <TextView
+        android:id="@+id/tvDistretto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:text="Distretto: -" />
+
     <ImageView
         android:id="@+id/imgOriginal"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scaleType="fitCenter" />
+        android:layout_marginTop="8dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Foto con maschera lesioni" />
 
     <ImageView
         android:id="@+id/imgMask"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:scaleType="fitCenter" />
+        android:layout_marginTop="8dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Maschera lesioni" />
 
     <TextView
         android:id="@+id/tvBsa"
@@ -26,13 +39,20 @@
         android:textSize="24sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:padding="16dp"
+        android:padding="12dp"
         android:text="BSA: -%" />
+
+    <Button
+        android:id="@+id/btnSalva"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Salva nella sessione" />
 
     <Button
         android:id="@+id/btnBack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nuova foto" />
+        android:layout_marginTop="4dp"
+        android:text="Scarta e torna" />
 
 </LinearLayout>

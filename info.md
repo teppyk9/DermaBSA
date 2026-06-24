@@ -1,0 +1,1 @@
+https://www.kaggle.com/datasets/tschandl/isic2018-challenge-task1-data-segmentation

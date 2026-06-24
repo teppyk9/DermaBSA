@@ -2,6 +2,7 @@ package com.uninsubria.derma_bsa.ui.fragment
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,11 +16,19 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.uninsubria.derma_bsa.AppViewModel
+import com.uninsubria.derma_bsa.R
 import com.uninsubria.derma_bsa.databinding.FragmentCameraBinding
 import com.uninsubria.derma_bsa.util.OnnxHelper
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+/**
+ * Secondo step del flusso di misurazione: acquisizione dell'immagine.
+ *
+ * L'utente può scattare una foto con la fotocamera posteriore oppure
+ * selezionarne una dalla galleria. In entrambi i casi l'immagine viene
+ * salvata nel ViewModel e si naviga a [CropFragment] per il ritaglio.
+ */
 class CameraFragment : Fragment() {
 
     private var _binding: FragmentCameraBinding? = null
@@ -43,7 +52,7 @@ class CameraFragment : Fragment() {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
             val bitmap = BitmapFactory.decodeStream(inputStream)
             inputStream?.close()
-            if (bitmap != null) processImage(bitmap)
+            if (bitmap != null) navigateToCrop(bitmap)
             else Toast.makeText(requireContext(), "Impossibile caricare immagine", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Errore galleria: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -60,8 +69,12 @@ class CameraFragment : Fragment() {
         OnnxHelper.init(requireContext())
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        val region = viewModel.selectedRegion.value
+        binding.tvDistretto.text = "Distretto: ${region?.label ?: "-"} (${region?.bsaPercent?.toInt() ?: "-"}%)"
+
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
-            == PackageManager.PERMISSION_GRANTED) {
+            == PackageManager.PERMISSION_GRANTED
+        ) {
             startCamera()
         } else {
             permissionLauncher.launch(Manifest.permission.CAMERA)
@@ -71,6 +84,10 @@ class CameraFragment : Fragment() {
         binding.btnGallery.setOnClickListener { galleryLauncher.launch("image/*") }
     }
 
+    /**
+     * Avvia il binding della fotocamera posteriore alla PreviewView
+     * e prepara l'oggetto [ImageCapture] per la cattura.
+     */
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         cameraProviderFuture.addListener({
@@ -93,35 +110,43 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
+    /**
+     * Scatta una foto con la fotocamera e, in caso di successo, avvia il flusso
+     * di ritaglio navigando a [CropFragment].
+     */
     private fun takePhoto() {
         val capture = imageCapture ?: return
+        binding.btnCapture.isEnabled = false
         capture.takePicture(cameraExecutor, object : ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 val bitmap = image.toBitmap()
                 image.close()
-                processImage(bitmap)
+                requireActivity().runOnUiThread {
+                    binding.btnCapture.isEnabled = true
+                    navigateToCrop(bitmap)
+                }
             }
 
             override fun onError(exception: ImageCaptureException) {
                 requireActivity().runOnUiThread {
+                    binding.btnCapture.isEnabled = true
                     Toast.makeText(requireContext(), "Errore: ${exception.message}", Toast.LENGTH_SHORT).show()
                 }
             }
         })
     }
 
-    private fun processImage(bitmap: android.graphics.Bitmap) {
-        cameraExecutor.execute {
-            val mask = OnnxHelper.segment(bitmap)
-            val bsa  = OnnxHelper.calcBsa(mask, 18f)
-            viewModel.setLastCapture(bitmap, mask, bsa)
-            requireActivity().runOnUiThread {
-                parentFragmentManager.beginTransaction()
-                    .replace(com.uninsubria.derma_bsa.R.id.fragment_container, ResultFragment())
-                    .addToBackStack(null)
-                    .commit()
-            }
-        }
+    /**
+     * Salva il bitmap nel ViewModel e naviga a [CropFragment].
+     *
+     * @param bitmap immagine appena scattata o selezionata dalla galleria
+     */
+    private fun navigateToCrop(bitmap: Bitmap) {
+        viewModel.setCroppedBitmap(bitmap)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, CropFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {

@@ -3,14 +3,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center">
+    android:padding="16dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seleziona distretto anatomico"
-        android:textSize="20sp"
-        android:textStyle="bold"/>
+        android:text="Tocca il distretto anatomico da misurare"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <RadioGroup
+        android:id="@+id/toggleVista"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/rbFronte"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Fronte" />
+
+        <RadioButton
+            android:id="@+id/rbRetro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="Retro" />
+    </RadioGroup>
+
+    <com.uninsubria.derma_bsa.ui.view.BodyMapView
+        android:id="@+id/bodyMap"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tvSelezione"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:textSize="16sp"
+        android:text="Nessun distretto selezionato" />
+
+    <Button
+        android:id="@+id/btnContinua"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="Continua" />
 
 </LinearLayout>

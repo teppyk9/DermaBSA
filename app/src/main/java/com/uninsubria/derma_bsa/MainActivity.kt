@@ -6,6 +6,12 @@ import androidx.fragment.app.commit
 import com.uninsubria.derma_bsa.databinding.ActivityMainBinding
 import com.uninsubria.derma_bsa.ui.fragment.HomeFragment
 
+/**
+ * Activity principale e unico contenitore dell'applicazione.
+ *
+ * Ospita un [android.widget.FrameLayout] in cui vengono sostituiti i Fragment
+ * durante la navigazione. Non contiene logica di business.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
