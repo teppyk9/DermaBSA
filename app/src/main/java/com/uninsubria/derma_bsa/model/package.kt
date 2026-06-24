@@ -1,7 +1,9 @@
 /**
  * Pacchetto del modello dei dati.
  *
- * Definisce i distretti anatomici ([BodyRegion]), le macro-regioni PASI ([PasiRegion])
- * e la lista completa delle regioni secondo la Regola dei Nove ([ALL_REGIONS]).
+ * Contiene il modello anatomico ([BodyRegion], [PasiRegion], [ALL_REGIONS])
+ * e il livello di persistenza Room: le entità [Patient] e [Measurement],
+ * i rispettivi DAO ([PatientDao], [MeasurementDao]), il database ([AppDatabase])
+ * e il repository ([PatientRepository]).
  */
 package com.uninsubria.derma_bsa.model

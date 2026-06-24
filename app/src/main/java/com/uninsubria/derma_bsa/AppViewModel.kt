@@ -1,13 +1,20 @@
 package com.uninsubria.derma_bsa
 
+import android.app.Application
 import android.graphics.Bitmap
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import com.uninsubria.derma_bsa.model.AppDatabase
 import com.uninsubria.derma_bsa.model.BodyRegion
+import com.uninsubria.derma_bsa.model.Measurement
+import com.uninsubria.derma_bsa.model.PatientConBsa
+import com.uninsubria.derma_bsa.model.PatientRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.io.File
 
 /**
- * Rappresenta la misura di un singolo distretto anatomico.
+ * Rappresenta la misura di un singolo distretto anatomico nella sessione corrente.
  *
  * @property region distretto anatomico misurato
  * @property bsaPercent contributo percentuale al BSA totale
@@ -15,23 +22,35 @@ import kotlinx.coroutines.flow.StateFlow
 data class RegionMeasurement(val region: BodyRegion, val bsaPercent: Float)
 
 /**
- * ViewModel condiviso tra tutti i Fragment della sessione di misurazione.
+ * ViewModel condiviso tra tutti i Fragment dell'applicazione.
  *
- * Mantiene in memoria lo stato corrente: il distretto selezionato, le misure
- * accumulate, i bitmap intermedi e i risultati finali. Tutti i dati vengono
- * azzerati da [resetSession] quando si inizia una nuova sessione.
+ * Gestisce sia lo stato della sessione di misurazione corrente (in memoria)
+ * sia l'accesso al database tramite [PatientRepository]. Estende
+ * [AndroidViewModel] per poter accedere al contesto dell'applicazione,
+ * necessario per creare il database e salvare le foto su disco.
  */
-class AppViewModel : ViewModel() {
+class AppViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val repository: PatientRepository
+
+    init {
+        val db = AppDatabase.getInstance(application)
+        repository = PatientRepository(db.patientDao(), db.measurementDao())
+    }
+
+    /** Id del paziente corrente; -1 se nessun paziente è selezionato. */
+    var currentPatientId: Long = -1L
+        private set
 
     /** Distretto anatomico selezionato sulla mappa corporea. */
     private val _selectedRegion = MutableStateFlow<BodyRegion?>(null)
     val selectedRegion: StateFlow<BodyRegion?> = _selectedRegion
 
-    /** Lista delle misure per distretto accumulate nella sessione corrente. */
+    /** Lista delle misure per distretto accumulate nella sessione corrente (in memoria). */
     private val _measurements = MutableStateFlow<List<RegionMeasurement>>(emptyList())
     val measurements: StateFlow<List<RegionMeasurement>> = _measurements
 
-    /** Somma dei contributi BSA di tutti i distretti misurati. */
+    /** Somma dei contributi BSA di tutti i distretti misurati nella sessione corrente. */
     private val _totalBsa = MutableStateFlow(0f)
     val totalBsa: StateFlow<Float> = _totalBsa
 
@@ -57,6 +76,80 @@ class AppViewModel : ViewModel() {
     /** Valore BSA calcolato per l'ultima misura, mostrato nei risultati. */
     private val _lastBsa = MutableStateFlow(0f)
     val lastBsa: StateFlow<Float> = _lastBsa
+
+    /**
+     * Flow reattivo con tutti i pazienti e il loro BSA totale,
+     * usato dalla lista pazienti.
+     */
+    val pazienti: Flow<List<PatientConBsa>> = repository.getAllPazientiConBsa()
+
+    /**
+     * Imposta il paziente corrente per la sessione di misurazione.
+     *
+     * @param id id del paziente selezionato o appena creato
+     */
+    fun impostaPatiente(id: Long) {
+        currentPatientId = id
+    }
+
+    /**
+     * Crea un nuovo paziente nel database e restituisce l'id assegnato.
+     *
+     * @param nome nome del paziente
+     * @param cognome cognome del paziente
+     * @return id del paziente appena creato
+     */
+    suspend fun creaPaziente(nome: String, cognome: String): Long =
+        repository.creaPaziente(nome, cognome)
+
+    /**
+     * Restituisce le misure per distretto di un paziente come Flow reattivo,
+     * usato dal dettaglio paziente.
+     *
+     * @param patientId id del paziente
+     */
+    fun getMisurePerPaziente(patientId: Long): Flow<List<Measurement>> =
+        repository.getMisurePerPaziente(patientId)
+
+    /**
+     * Salva i risultati dell'ultima inferenza su database e su disco.
+     *
+     * Salva l'immagine con overlay e la maschera come file JPEG in
+     * `filesDir/photos/`, poi inserisce il record nel database.
+     * Se esiste già una misura per lo stesso distretto e paziente,
+     * viene sostituita.
+     *
+     * @param overlay bitmap con la maschera rossa sovrapposta all'immagine originale
+     * @param mask maschera 256×256 prodotta da derma_seg
+     * @param bsaPercent contributo BSA calcolato per il distretto corrente
+     */
+    suspend fun salvaMisuraSuDb(overlay: Bitmap, mask: Bitmap, bsaPercent: Float) {
+        val region = _selectedRegion.value ?: return
+        val pid = currentPatientId
+        if (pid < 0L) return
+
+        val app = getApplication<Application>()
+        val dir = File(app.filesDir, "photos").also { if (!it.exists()) it.mkdirs() }
+
+        val overlayFile = File(dir, "p${pid}_${region.id}_overlay.jpg")
+        overlayFile.outputStream().use { out -> overlay.compress(Bitmap.CompressFormat.JPEG, 90, out) }
+
+        val maskFile = File(dir, "p${pid}_${region.id}_mask.jpg")
+        maskFile.outputStream().use { out -> mask.compress(Bitmap.CompressFormat.JPEG, 90, out) }
+
+        repository.salvaMisura(
+            Measurement(
+                patientId = pid,
+                regionId = region.id,
+                regionLabel = region.label,
+                bsaPercent = bsaPercent,
+                photoPath = overlayFile.absolutePath,
+                maskPath = maskFile.absolutePath
+            )
+        )
+
+        addMeasurement(region, bsaPercent)
+    }
 
     /**
      * Salva il distretto scelto dall'utente sulla mappa anatomica.
@@ -100,7 +193,7 @@ class AppViewModel : ViewModel() {
     }
 
     /**
-     * Aggiunge o aggiorna la misura del distretto specificato.
+     * Aggiunge o aggiorna la misura del distretto nella lista in memoria.
      * Se esiste già una misura per lo stesso distretto, viene sostituita.
      *
      * @param region distretto anatomico misurato
@@ -115,8 +208,8 @@ class AppViewModel : ViewModel() {
     }
 
     /**
-     * Azzera tutti i dati della sessione corrente.
-     * Da chiamare quando si vuole iniziare una nuova misurazione da zero.
+     * Azzera lo stato della sessione corrente in memoria.
+     * Non elimina i dati dal database né cambia il paziente corrente.
      */
     fun resetSession() {
         _measurements.value = emptyList()

@@ -8,18 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.uninsubria.derma_bsa.AppViewModel
 import com.uninsubria.derma_bsa.databinding.FragmentResultBinding
+import kotlinx.coroutines.launch
 
 /**
  * Quinto e ultimo step del flusso di misurazione: visualizzazione dei risultati.
  *
  * Mostra l'immagine del distretto con la maschera di segmentazione sovrapposta,
  * la maschera sola e il valore BSA calcolato.
- * L'utente può salvare la misura nella sessione corrente o scartarla e tornare
- * alla schermata principale.
+ * "Salva nella sessione" scrive la misura e le foto su database e torna a
+ * [BodyMapFragment] per consentire di misurare altri distretti dello stesso paziente.
+ * "Scarta e torna" torna a [BodyMapFragment] senza salvare.
  */
 class ResultFragment : Fragment() {
 
@@ -50,14 +52,19 @@ class ResultFragment : Fragment() {
         binding.tvBsa.text = "BSA distretto: ${"%.2f".format(bsa)}%"
 
         binding.btnSalva.setOnClickListener {
-            if (region != null) {
-                viewModel.addMeasurement(region, bsa)
-                Toast.makeText(requireContext(), "Misura salvata", Toast.LENGTH_SHORT).show()
+            if (region != null && original != null && mask != null) {
+                val overlay = creaOverlay(original, mask)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.salvaMisuraSuDb(overlay, mask, bsa)
+                    Toast.makeText(requireContext(), "Misura salvata", Toast.LENGTH_SHORT).show()
+                    tornaAllaMappaCorpo()
+                }
+            } else {
+                tornaAllaMappaCorpo()
             }
-            tornaAllaHome()
         }
 
-        binding.btnBack.setOnClickListener { tornaAllaHome() }
+        binding.btnBack.setOnClickListener { tornaAllaMappaCorpo() }
     }
 
     /**
@@ -79,10 +86,12 @@ class ResultFragment : Fragment() {
     }
 
     /**
-     * Svuota il back stack e torna alla schermata principale ([HomeFragment]).
+     * Torna a [BodyMapFragment] svuotando il back stack fino al tag "bodymap"
+     * (esclusivo), in modo che l'utente possa misurare un altro distretto
+     * per lo stesso paziente o tornare alla lista pazienti premendo indietro.
      */
-    private fun tornaAllaHome() {
-        parentFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    private fun tornaAllaMappaCorpo() {
+        parentFragmentManager.popBackStack("bodymap", 0)
     }
 
     override fun onDestroyView() {
