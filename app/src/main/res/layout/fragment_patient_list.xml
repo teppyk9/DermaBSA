@@ -2,15 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/color_background">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Pazienti"
-        android:textSize="22sp"
+        android:textSize="24sp"
         android:textStyle="bold"
-        android:padding="16dp" />
+        android:paddingHorizontal="20dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="12dp" />
 
     <TextView
         android:id="@+id/tvEmpty"
@@ -20,19 +23,25 @@
         android:gravity="center"
         android:text="Nessun paziente registrato."
         android:textSize="16sp"
+        android:textColor="#9E9E9E"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvPazienti"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="4dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false" />
 
     <Button
         android:id="@+id/btnNuovaSessione"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="24dp"
         android:text="Nuova sessione" />
 
 </LinearLayout>

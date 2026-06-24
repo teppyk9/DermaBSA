@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
+    android:background="@color/color_background"
     android:padding="32dp">
 
     <ImageView
@@ -19,6 +20,7 @@
         android:text="DermaBSA"
         android:textSize="36sp"
         android:textStyle="bold"
+        android:textColor="?attr/colorPrimary"
         android:gravity="center" />
 
     <TextView
@@ -27,13 +29,14 @@
         android:layout_marginTop="8dp"
         android:text="Stima della superficie corporea interessata da psoriasi"
         android:textSize="14sp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textColor="#757575" />
 
     <Button
         android:id="@+id/btnMisura"
-        android:layout_width="200dp"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:text="Misura" />
+        android:layout_marginTop="56dp"
+        android:text="Inizia" />
 
 </LinearLayout>

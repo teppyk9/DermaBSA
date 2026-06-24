@@ -2,15 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#000000">
 
     <TextView
         android:id="@+id/tvDistrettoCrop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="12dp"
         android:gravity="center"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
         android:text="Posiziona la sagoma sul distretto" />
 
     <com.uninsubria.derma_bsa.ui.view.CropOverlayView
@@ -23,14 +25,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp">
 
         <Button
             android:id="@+id/btnCropBack"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:text="Indietro" />
 
         <Button
@@ -38,8 +42,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
-            android:text="Conferma ritaglio" />
+            android:text="Conferma" />
 
     </LinearLayout>
 

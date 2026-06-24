@@ -2,17 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#000000">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:padding="10dp"
         android:gravity="center"
         android:textStyle="bold"
+        android:textColor="#FFFFFF"
         android:text="Seleziona l'area interessata" />
 
-    <!-- Stack: immagine sotto, canvas di selezione sopra -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -32,13 +33,12 @@
 
     </FrameLayout>
 
-    <!-- Toolbar strumenti -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingTop="4dp">
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp">
 
         <ToggleButton
             android:id="@+id/btnBrush"
@@ -69,18 +69,18 @@
 
     </LinearLayout>
 
-    <!-- Slider dimensione pennello/gomma -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
-        android:paddingBottom="4dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="4dp"
         android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
             android:text="Dim: " />
 
         <SeekBar
@@ -93,15 +93,17 @@
 
     </LinearLayout>
 
-    <!-- Azioni principali -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="8dp">
+        android:paddingHorizontal="12dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="12dp">
 
         <Button
             android:id="@+id/btnIndietro"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -110,6 +112,7 @@
 
         <Button
             android:id="@+id/btnAutoDetect"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -121,7 +124,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
             android:text="Analizza" />
 
     </LinearLayout>

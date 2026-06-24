@@ -3,20 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@color/color_background"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tocca il distretto anatomico da misurare"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
 
     <RadioGroup
         android:id="@+id/toggleVista"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:orientation="horizontal">
 
         <RadioButton
@@ -32,22 +36,22 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:text="Retro" />
+
     </RadioGroup>
 
     <com.uninsubria.derma_bsa.ui.view.BodyMapView
         android:id="@+id/bodyMap"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="8dp" />
+        android:layout_weight="1" />
 
     <TextView
         android:id="@+id/tvSelezione"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="8dp"
-        android:textSize="16sp"
+        android:paddingVertical="10dp"
+        android:textSize="15sp"
         android:text="Nessun distretto selezionato" />
 
     <LinearLayout
@@ -57,10 +61,11 @@
 
         <Button
             android:id="@+id/btnAnnulla"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp"
+            android:layout_marginEnd="8dp"
             android:text="Annulla" />
 
         <Button
@@ -68,7 +73,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="4dp"
             android:enabled="false"
             android:text="Continua" />
 
