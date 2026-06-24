@@ -231,6 +231,27 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Elimina una sessione dal database e cancella i file foto/maschera su disco.
+     *
+     * @param sessionId id della sessione da eliminare
+     */
+    suspend fun eliminaSessione(sessionId: Long) {
+        val percorsi = repository.eliminaSessione(sessionId)
+        percorsi.forEach { java.io.File(it).delete() }
+    }
+
+    /**
+     * Elimina un paziente dal database con tutte le sue sessioni e misure,
+     * e cancella i file foto/maschera su disco.
+     *
+     * @param patientId id del paziente da eliminare
+     */
+    suspend fun eliminaPaziente(patientId: Long) {
+        val percorsi = repository.eliminaPaziente(patientId)
+        percorsi.forEach { java.io.File(it).delete() }
+    }
+
+    /**
      * Azzera lo stato della sessione corrente in memoria.
      * Non elimina i dati dal database né cambia il paziente corrente.
      */
