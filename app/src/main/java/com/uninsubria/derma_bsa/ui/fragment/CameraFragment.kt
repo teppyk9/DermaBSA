@@ -82,6 +82,7 @@ class CameraFragment : Fragment() {
 
         binding.btnCapture.setOnClickListener { takePhoto() }
         binding.btnGallery.setOnClickListener { galleryLauncher.launch("image/*") }
+        binding.btnIndietro.setOnClickListener { parentFragmentManager.popBackStack() }
     }
 
     /**

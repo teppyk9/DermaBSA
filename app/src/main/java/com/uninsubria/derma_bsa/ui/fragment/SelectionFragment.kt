@@ -54,6 +54,8 @@ class SelectionFragment : Fragment() {
         configuraTool()
         configuraSeekBar()
 
+        binding.btnIndietro.setOnClickListener { parentFragmentManager.popBackStack() }
+
         binding.btnClearSelection.setOnClickListener {
             binding.selectionCanvas.clearSelection()
         }

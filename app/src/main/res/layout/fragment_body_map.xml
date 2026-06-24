@@ -50,11 +50,28 @@
         android:textSize="16sp"
         android:text="Nessun distretto selezionato" />
 
-    <Button
-        android:id="@+id/btnContinua"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="Continua" />
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnAnnulla"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Annulla" />
+
+        <Button
+            android:id="@+id/btnContinua"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:enabled="false"
+            android:text="Continua" />
+
+    </LinearLayout>
 
 </LinearLayout>

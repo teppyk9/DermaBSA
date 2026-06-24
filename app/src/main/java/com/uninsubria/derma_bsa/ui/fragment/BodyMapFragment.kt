@@ -49,6 +49,10 @@ class BodyMapFragment : Fragment() {
             binding.btnContinua.isEnabled = false
         }
 
+        binding.btnAnnulla.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
         binding.btnContinua.setOnClickListener {
             val region = selezione ?: return@setOnClickListener
             viewModel.selectRegion(region)

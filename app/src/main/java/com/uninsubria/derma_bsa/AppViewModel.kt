@@ -8,6 +8,7 @@ import com.uninsubria.derma_bsa.model.BodyRegion
 import com.uninsubria.derma_bsa.model.Measurement
 import com.uninsubria.derma_bsa.model.PatientConBsa
 import com.uninsubria.derma_bsa.model.PatientRepository
+import com.uninsubria.derma_bsa.model.SessioneConMisure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,11 +36,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val db = AppDatabase.getInstance(application)
-        repository = PatientRepository(db.patientDao(), db.measurementDao())
+        repository = PatientRepository(db.patientDao(), db.sessionDao(), db.measurementDao())
     }
 
     /** Id del paziente corrente; -1 se nessun paziente è selezionato. */
     var currentPatientId: Long = -1L
+        private set
+
+    /** Id della sessione corrente; -1 se nessuna sessione è stata creata. */
+    var currentSessionId: Long = -1L
         private set
 
     /** Distretto anatomico selezionato sulla mappa corporea. */
@@ -78,18 +83,33 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     val lastBsa: StateFlow<Float> = _lastBsa
 
     /**
-     * Flow reattivo con tutti i pazienti e il loro BSA totale,
+     * Flow reattivo con tutti i pazienti e il BSA dell'ultima sessione,
      * usato dalla lista pazienti.
      */
     val pazienti: Flow<List<PatientConBsa>> = repository.getAllPazientiConBsa()
 
     /**
      * Imposta il paziente corrente per la sessione di misurazione.
+     * Azzera anche la sessione corrente in attesa che venga creata una nuova.
      *
      * @param id id del paziente selezionato o appena creato
      */
     fun impostaPatiente(id: Long) {
         currentPatientId = id
+        currentSessionId = -1L
+    }
+
+    /**
+     * Crea una nuova sessione di visita per il paziente corrente nel database
+     * e la imposta come sessione corrente.
+     *
+     * @param patientId id del paziente per cui creare la sessione
+     * @return id della sessione appena creata
+     */
+    suspend fun creaSessione(patientId: Long): Long {
+        val sessionId = repository.creaSessione(patientId)
+        currentSessionId = sessionId
+        return sessionId
     }
 
     /**
@@ -103,21 +123,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         repository.creaPaziente(nome, cognome)
 
     /**
-     * Restituisce le misure per distretto di un paziente come Flow reattivo,
-     * usato dal dettaglio paziente.
+     * Restituisce le sessioni di un paziente con le relative misure come Flow reattivo,
+     * ordinate dalla più recente alla più vecchia. Usato dal dettaglio paziente.
      *
      * @param patientId id del paziente
      */
-    fun getMisurePerPaziente(patientId: Long): Flow<List<Measurement>> =
-        repository.getMisurePerPaziente(patientId)
+    fun getSessioniConMisurePerPaziente(patientId: Long): Flow<List<SessioneConMisure>> =
+        repository.getSessioniConMisurePerPaziente(patientId)
 
     /**
      * Salva i risultati dell'ultima inferenza su database e su disco.
      *
      * Salva l'immagine con overlay e la maschera come file JPEG in
      * `filesDir/photos/`, poi inserisce il record nel database.
-     * Se esiste già una misura per lo stesso distretto e paziente,
-     * viene sostituita.
+     * All'interno della stessa sessione, se esiste già una misura per lo
+     * stesso distretto, viene sostituita. Sessioni diverse conservano
+     * le proprie misure indipendentemente.
      *
      * @param overlay bitmap con la maschera rossa sovrapposta all'immagine originale
      * @param mask maschera 256×256 prodotta da derma_seg
@@ -126,20 +147,22 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     suspend fun salvaMisuraSuDb(overlay: Bitmap, mask: Bitmap, bsaPercent: Float) {
         val region = _selectedRegion.value ?: return
         val pid = currentPatientId
-        if (pid < 0L) return
+        val sid = currentSessionId
+        if (pid < 0L || sid < 0L) return
 
         val app = getApplication<Application>()
         val dir = File(app.filesDir, "photos").also { if (!it.exists()) it.mkdirs() }
 
-        val overlayFile = File(dir, "p${pid}_${region.id}_overlay.jpg")
+        val overlayFile = File(dir, "p${pid}_s${sid}_${region.id}_overlay.jpg")
         overlayFile.outputStream().use { out -> overlay.compress(Bitmap.CompressFormat.JPEG, 90, out) }
 
-        val maskFile = File(dir, "p${pid}_${region.id}_mask.jpg")
+        val maskFile = File(dir, "p${pid}_s${sid}_${region.id}_mask.jpg")
         maskFile.outputStream().use { out -> mask.compress(Bitmap.CompressFormat.JPEG, 90, out) }
 
         repository.salvaMisura(
             Measurement(
                 patientId = pid,
+                sessionId = sid,
                 regionId = region.id,
                 regionLabel = region.label,
                 bsaPercent = bsaPercent,
