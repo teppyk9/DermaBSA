@@ -32,8 +32,7 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
     var currentSessionId: Long = -1L
         private set
 
-    // Età in anni del paziente corrente (2/7/12/20 per fascia), 0 se sconosciuta
-    var currentPatientBirthdate: Long = 0L
+    var currentPatientEta: Long = 0L
         private set
 
     private val _selectedRegion = MutableStateFlow<BodyRegion?>(null)
@@ -65,14 +64,14 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
 
     val pazienti: Flow<List<PatientConBsa>> = repository.getAllPazientiConBsa()
 
-    fun impostaPatiente(id: Long, dataNascita: Long = 0L) {
+    fun impostaPatiente(id: Long, etaAnni: Long = 0L) {
         currentPatientId = id
-        currentPatientBirthdate = dataNascita
+        currentPatientEta = etaAnni
         currentSessionId = -1L
     }
 
     fun regionsPerPazienteCorrente(): List<BodyRegion> {
-        val ageYears = if (currentPatientBirthdate > 0L) currentPatientBirthdate.toInt() else 20
+        val ageYears = if (currentPatientEta > 0L) currentPatientEta.toInt() else 20
         return regioniPerEta(ageYears)
     }
 
@@ -82,8 +81,8 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         return sessionId
     }
 
-    suspend fun creaPaziente(nome: String, cognome: String, dataNascita: Long = 0L): Long =
-        repository.creaPaziente(nome, cognome, dataNascita)
+    suspend fun creaPaziente(nome: String, cognome: String, etaAnni: Long = 0L): Long =
+        repository.creaPaziente(nome, cognome, etaAnni)
 
     fun getSessioniConMisurePerPaziente(patientId: Long): Flow<List<SessioneConMisure>> =
         repository.getSessioniConMisurePerPaziente(patientId)

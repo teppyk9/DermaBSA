@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface PatientDao {
 
     @Query("""
-        SELECT p.id, p.nome, p.cognome, p.dataNascita, p.dataCreazione,
+        SELECT p.id, p.nome, p.cognome, p.etaAnni, p.dataCreazione,
                COALESCE((
                    SELECT SUM(m.bsaPercent)
                    FROM misure m

@@ -111,7 +111,7 @@ class PatientListFragment : Fragment() {
     private fun apriDettaglio(paziente: PatientConBsa) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, PatientDetailFragment.newInstance(
-                paziente.id, paziente.nome, paziente.cognome, paziente.dataNascita
+                paziente.id, paziente.nome, paziente.cognome, paziente.etaAnni
             ))
             .addToBackStack(null)
             .commit()

@@ -8,6 +8,6 @@ data class Patient(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val nome: String,
     val cognome: String,
-    val dataNascita: Long = 0L,
+    val etaAnni: Long = 0L,
     val dataCreazione: Long = System.currentTimeMillis()
 )

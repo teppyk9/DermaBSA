@@ -75,8 +75,8 @@ class PatientDetailFragment : Fragment() {
 
         binding.btnAggiungiMisurazione.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                val dataNascita = requireArguments().getLong(ARG_DATA_NASCITA, 0L)
-                viewModel.impostaPatiente(patientId, dataNascita)
+                val etaAnni = requireArguments().getLong(ARG_ETA_ANNI, 0L)
+                viewModel.impostaPatiente(patientId, etaAnni)
                 viewModel.resetSession()
                 viewModel.creaSessione(patientId)
                 parentFragmentManager.beginTransaction()
@@ -141,15 +141,15 @@ class PatientDetailFragment : Fragment() {
         private const val ARG_PATIENT_ID = "patient_id"
         private const val ARG_NOME = "nome"
         private const val ARG_COGNOME = "cognome"
-        private const val ARG_DATA_NASCITA = "data_nascita"
+        private const val ARG_ETA_ANNI = "eta_anni"
 
-        fun newInstance(patientId: Long, nome: String, cognome: String, dataNascita: Long = 0L) =
+        fun newInstance(patientId: Long, nome: String, cognome: String, etaAnni: Long = 0L) =
             PatientDetailFragment().apply {
                 arguments = Bundle().apply {
                     putLong(ARG_PATIENT_ID, patientId)
                     putString(ARG_NOME, nome)
                     putString(ARG_COGNOME, cognome)
-                    putLong(ARG_DATA_NASCITA, dataNascita)
+                    putLong(ARG_ETA_ANNI, etaAnni)
                 }
             }
     }

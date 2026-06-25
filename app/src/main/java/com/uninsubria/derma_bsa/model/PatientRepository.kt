@@ -10,8 +10,8 @@ class PatientRepository(
 
     fun getAllPazientiConBsa(): Flow<List<PatientConBsa>> = patientDao.getAllConBsa()
 
-    suspend fun creaPaziente(nome: String, cognome: String, dataNascita: Long): Long =
-        patientDao.inserisci(Patient(nome = nome, cognome = cognome, dataNascita = dataNascita))
+    suspend fun creaPaziente(nome: String, cognome: String, etaAnni: Long): Long =
+        patientDao.inserisci(Patient(nome = nome, cognome = cognome, etaAnni = etaAnni))
 
     suspend fun creaSessione(patientId: Long): Long =
         sessionDao.inserisci(Session(patientId = patientId))
