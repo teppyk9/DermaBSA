@@ -2,6 +2,7 @@ package com.uninsubria.derma_bsa
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
 import com.uninsubria.derma_bsa.databinding.ActivityMainBinding
 import com.uninsubria.derma_bsa.ui.fragment.WelcomeFragment
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)

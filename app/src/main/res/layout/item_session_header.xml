@@ -30,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textStyle="bold"
+                android:textColor="@color/teal_800"
                 android:text="Sessione: gg/mm/aaaa hh:mm" />
 
             <TextView
@@ -38,6 +39,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:textSize="13sp"
+                android:textColor="@color/teal_800"
                 android:text="BSA sessione: 0.00%" />
 
         </LinearLayout>

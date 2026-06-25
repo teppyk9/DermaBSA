@@ -18,19 +18,27 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="3dp"
-            app:cardBackgroundColor="?attr/colorPrimary">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
-            <TextView
-                android:id="@+id/tvTotalBsa"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:padding="24dp"
-                android:textColor="@color/white"
-                android:text="BSA Totale: 0.00%" />
+                android:orientation="vertical"
+                android:background="@drawable/gradient_teal_header"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/tvTotalBsa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:text="BSA Totale: 0.00%" />
+
+            </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
 

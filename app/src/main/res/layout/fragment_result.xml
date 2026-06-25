@@ -61,6 +61,7 @@
         android:textStyle="bold"
         android:gravity="center"
         android:paddingVertical="8dp"
+        android:textColor="@color/teal_800"
         android:text="BSA: -%" />
 
     <Button
