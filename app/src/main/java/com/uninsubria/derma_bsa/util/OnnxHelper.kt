@@ -12,7 +12,7 @@ import kotlin.math.exp
 /**
  * Singleton che gestisce il modello ONNX di segmentazione delle lesioni cutanee.
  *
- * Il modello `derma_seg.onnx` accetta in input un'immagine 256×256 normalizzata
+ * Il modello `derma_seg_v2.onnx` accetta in input un'immagine 512×512 normalizzata
  * con i valori ImageNet e restituisce una mappa di probabilità della stessa dimensione,
  * dove ogni pixel indica quanto è probabile che sia una lesione psoriasica.
  *
@@ -26,6 +26,8 @@ object OnnxHelper {
     private val mean = floatArrayOf(0.485f, 0.456f, 0.406f)
     private val std  = floatArrayOf(0.229f, 0.224f, 0.225f)
 
+    private const val MODEL_SIZE = 512
+
     /**
      * Carica il modello ONNX dal percorso `filesDir` del contesto, copiandolo
      * prima dagli asset se non è ancora presente sul disco.
@@ -36,14 +38,14 @@ object OnnxHelper {
     fun init(context: Context) {
         if (session != null) return
 
-        val modelFile = File(context.filesDir, "derma_seg.onnx")
-        val dataFile  = File(context.filesDir, "derma_seg.onnx.data")
+        val modelFile = File(context.filesDir, "derma_seg_v2.onnx")
+        val dataFile  = File(context.filesDir, "derma_seg_v2.onnx.data")
 
         if (!modelFile.exists()) {
-            context.assets.open("derma_seg.onnx").use { it.copyTo(modelFile.outputStream()) }
+            context.assets.open("derma_seg_v2.onnx").use { it.copyTo(modelFile.outputStream()) }
         }
         if (!dataFile.exists()) {
-            context.assets.open("derma_seg.onnx.data").use { it.copyTo(dataFile.outputStream()) }
+            context.assets.open("derma_seg_v2.onnx.data").use { it.copyTo(dataFile.outputStream()) }
         }
 
         session = env.createSession(modelFile.absolutePath)
@@ -52,15 +54,15 @@ object OnnxHelper {
     /**
      * Esegue la segmentazione delle lesioni sull'immagine fornita.
      *
-     * L'immagine viene ridimensionata a 256×256, normalizzata con i valori ImageNet
-     * e passata al modello. Il risultato è una bitmap 256×256 in cui i pixel rossi
-     * semitrasparenti (`0x99FF0000`) indicano le aree classificate come lesioni.
+     * L'immagine viene ridimensionata a 512×512, normalizzata con i valori ImageNet
+     * e passata al modello. Il risultato è una bitmap 512×512 in cui i pixel rossi
+     * semitrasparenti (`0x77FF0000`) indicano le aree classificate come lesioni.
      *
      * @param bitmap immagine di input (qualsiasi risoluzione)
-     * @return maschera 256×256 con le lesioni evidenziate in rosso
+     * @return maschera 512×512 con le lesioni evidenziate in rosso
      */
     fun segment(bitmap: Bitmap): Bitmap {
-        val size = 256
+        val size = MODEL_SIZE
         val scaled = Bitmap.createScaledBitmap(bitmap, size, size, true)
 
         val floatBuf = FloatBuffer.allocate(3 * size * size)
@@ -103,7 +105,7 @@ object OnnxHelper {
      *
      * @param bitmap immagine ritagliata da analizzare
      * @param selectionMask maschera bianca su trasparente disegnata dall'utente, oppure `null`
-     * @return maschera 256×256 con le lesioni evidenziate in rosso
+     * @return maschera 512×512 con le lesioni evidenziate in rosso
      */
     fun segmentWithMask(bitmap: Bitmap, selectionMask: Bitmap?): Bitmap {
         if (selectionMask == null) return segment(bitmap)
@@ -130,11 +132,7 @@ object OnnxHelper {
     /**
      * Calcola il contributo percentuale al BSA totale del distretto misurato.
      *
-     * Conta i pixel con canale alpha maggiore di zero nella maschera (quelli rossi)
-     * e li rapporta al totale dei pixel. Il risultato viene moltiplicato per la
-     * percentuale di superficie corporea che il distretto rappresenta.
-     *
-     * @param mask maschera 256×256 prodotta da [segment] o [segmentWithMask]
+     * @param mask maschera 512×512 prodotta da [segment] o [segmentWithMask]
      * @param regionBsaPercent percentuale BSA del distretto (es. 18.0 per il tronco)
      * @return contributo BSA del distretto in percentuale (0–regionBsaPercent)
      */
