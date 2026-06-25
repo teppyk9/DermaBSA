@@ -114,7 +114,7 @@ class BodyMapFragment : Fragment() {
         selectedView?.clearColorFilter()
 
         // Applica tint di selezione
-        imageView.setColorFilter(Color.argb(160, 21, 101, 192), PorterDuff.Mode.SRC_ATOP)
+        imageView.setColorFilter(Color.argb(160, 16, 95, 104), PorterDuff.Mode.SRC_ATOP)
         selectedView = imageView
         selezione = region
 

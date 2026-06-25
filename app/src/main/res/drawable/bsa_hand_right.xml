@@ -14,38 +14,38 @@
         <!-- Palm -->
         <path
             android:pathData="M2,20 L26,20 C27,20 28,21 28,23 L28,44 C28,45 27,46 25,46 L3,46 C1,46 0,45 0,44 L0,25 C0,22 1,20 2,20 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
         <!-- Pinky (x=1-6, height 12 — leftmost → rightmost after rotation) -->
         <path
             android:pathData="M1,20 L1,9 C1,7 2,7 3,7 L4,7 C5,7 5,8 5,9 L5,20 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
         <!-- Ring (x=6-12, height 18) -->
         <path
             android:pathData="M6,20 L6,4 C6,2 7,1 9,1 L10,1 C12,1 12,2 12,4 L12,20 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
         <!-- Middle (x=13-20, height 20 — longest) -->
         <path
             android:pathData="M13,20 L13,2 C13,0 14,0 16,0 L17,0 C19,0 19,0 19,2 L19,20 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
         <!-- Index (x=21-27, height 18) -->
         <path
             android:pathData="M21,20 L21,4 C21,2 22,1 24,1 L25,1 C27,1 27,2 27,4 L27,20 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
         <!-- Thumb (right side) -->
         <path
             android:pathData="M28,32 L28,26 C28,24 27,23 25,23 L24,23 C22,23 22,24 22,26 L22,32 Z"
-            android:fillColor="#BBDEFB"
-            android:strokeColor="#1565C0"
+            android:fillColor="#C8E6E2"
+            android:strokeColor="#105F68"
             android:strokeWidth="1.5"/>
 
     </group>

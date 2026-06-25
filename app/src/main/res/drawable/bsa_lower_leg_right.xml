@@ -14,7 +14,7 @@
                           L14,95 C9,95 6,92 6,88
                           L6,65 C2,60 0,55 0,45
                           L0,5 C0,2 2,0 4,0 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
 </vector>

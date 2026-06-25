@@ -9,34 +9,34 @@
     <!-- Main body: heel/ankle at left, straight right wall for toe attachment -->
     <path
         android:pathData="M4,4 L48,4 L48,24 L4,24 C1,24 0,22 0,14 C0,6 1,4 4,4 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
     <!-- Heel rounding on left already included above -->
 
     <!-- Big toe (base x=48, tip x=61, y=18-24) -->
     <path
         android:pathData="M48,24 L48,19 C54,19 60,21 61,22 C62,23 61,24 59,24 C56,24 48,23 48,24 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
     <!-- 2nd toe (y=14-17) -->
     <path
         android:pathData="M48,17 L48,14 C53,14 59,15 60,16 C61,16 60,17 58,17 C55,17 48,16 48,17 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
     <!-- 3rd toe (y=10-13) -->
     <path
         android:pathData="M48,13 L48,10 C52,10 58,11 59,12 C60,12 59,13 57,13 C54,13 48,12 48,13 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
     <!-- 4th toe/pinky (y=6-9) -->
     <path
         android:pathData="M48,9 L48,6 C51,6 57,7 58,8 C59,8 58,9 56,9 C53,9 48,8 48,9 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
 
 </vector>

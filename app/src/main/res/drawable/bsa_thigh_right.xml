@@ -9,7 +9,7 @@
     <!-- Same as left thigh -->
     <path
         android:pathData="M2,0 L48,0 C49,0 50,2 50,5 L50,90 C50,96 46,100 40,100 L10,100 C4,100 0,96 0,90 L0,5 C0,2 1,0 2,0 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
 </vector>

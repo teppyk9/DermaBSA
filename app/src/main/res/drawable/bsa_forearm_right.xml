@@ -9,7 +9,7 @@
     <!-- Same as left forearm -->
     <path
         android:pathData="M2,0 L30,0 C31,0 32,1 32,4 L32,70 C32,73 30,75 26,75 L6,75 C2,75 0,73 0,70 L0,4 C0,1 1,0 2,0 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
 </vector>

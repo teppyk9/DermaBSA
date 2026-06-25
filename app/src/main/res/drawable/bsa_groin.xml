@@ -9,7 +9,7 @@
     <!-- Groin: trapezoid narrower at top (connects to torso), wider at bottom -->
     <path
         android:pathData="M12,0 L48,0 L56,30 L4,30 Z"
-        android:fillColor="#BBDEFB"
-        android:strokeColor="#1565C0"
+        android:fillColor="#C8E6E2"
+        android:strokeColor="#105F68"
         android:strokeWidth="1.5"/>
 </vector>
