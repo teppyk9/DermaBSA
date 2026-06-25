@@ -57,9 +57,13 @@ class ResultFragment : Fragment() {
             if (region != null && original != null && mask != null) {
                 val overlay = creaOverlay(original, mask)
                 viewLifecycleOwner.lifecycleScope.launch {
-                    viewModel.salvaMisuraSuDb(overlay, mask, bsa)
-                    Toast.makeText(requireContext(), "Misura salvata", Toast.LENGTH_SHORT).show()
-                    tornaAllaMappaCorpo()
+                    try {
+                        viewModel.salvaMisuraSuDb(overlay, mask, bsa)
+                        Toast.makeText(requireContext(), "Misura salvata", Toast.LENGTH_SHORT).show()
+                        tornaAllaMappaCorpo()
+                    } catch (e: Exception) {
+                        Toast.makeText(requireContext(), "Errore durante il salvataggio: riprova", Toast.LENGTH_LONG).show()
+                    }
                 }
             } else {
                 tornaAllaMappaCorpo()

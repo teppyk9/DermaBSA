@@ -130,16 +130,24 @@ class SelectionFragment : Fragment() {
         binding.btnAutoDetect.isEnabled = false
 
         executor.execute {
-            val mask = OnnxHelper.segmentWithMask(cropped, selectionMask)
-            val bsa  = OnnxHelper.calcBsa(mask, regionBsaPercent) * viewModel.overlapRatio.value
-            viewModel.setLastCapture(cropped, mask, bsa)
-            requireActivity().runOnUiThread {
-                binding.btnAnalyze.isEnabled    = true
-                binding.btnAutoDetect.isEnabled = true
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, ResultFragment())
-                    .addToBackStack(null)
-                    .commit()
+            try {
+                val mask = OnnxHelper.segmentWithMask(cropped, selectionMask)
+                val bsa  = OnnxHelper.calcBsa(mask, regionBsaPercent) * viewModel.overlapRatio.value
+                viewModel.setLastCapture(cropped, mask, bsa)
+                requireActivity().runOnUiThread {
+                    binding.btnAnalyze.isEnabled    = true
+                    binding.btnAutoDetect.isEnabled = true
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, ResultFragment())
+                        .addToBackStack(null)
+                        .commit()
+                }
+            } catch (e: Exception) {
+                requireActivity().runOnUiThread {
+                    binding.btnAnalyze.isEnabled    = true
+                    binding.btnAutoDetect.isEnabled = true
+                    Toast.makeText(requireContext(), "Errore durante l'analisi: riprova", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

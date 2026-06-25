@@ -67,7 +67,13 @@ class CameraFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        OnnxHelper.init(requireContext())
+        try {
+            OnnxHelper.init(requireContext())
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Errore caricamento modello AI: impossibile avviare l'analisi", Toast.LENGTH_LONG).show()
+            binding.btnCapture.isEnabled = false
+            binding.btnGallery.isEnabled = false
+        }
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         val region = viewModel.selectedRegion.value

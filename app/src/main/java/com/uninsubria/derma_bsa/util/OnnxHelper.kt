@@ -63,6 +63,7 @@ object OnnxHelper {
      * @return maschera 512×512 con le lesioni evidenziate in rosso
      */
     fun segment(bitmap: Bitmap): Bitmap {
+        val sess = session ?: throw IllegalStateException("Modello ONNX non inizializzato")
         val size = MODEL_SIZE
         val scaled = Bitmap.createScaledBitmap(bitmap, size, size, true)
 
@@ -80,7 +81,7 @@ object OnnxHelper {
         }
 
         val tensor = OnnxTensor.createTensor(env, floatBuf, longArrayOf(1, 3, size.toLong(), size.toLong()))
-        val output = session!!.run(mapOf("input" to tensor))
+        val output = sess.run(mapOf("input" to tensor))
 
         @Suppress("UNCHECKED_CAST")
         val raw = (output[0].value as Array<Array<Array<FloatArray>>>)[0][0]
