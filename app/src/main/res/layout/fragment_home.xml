@@ -26,12 +26,23 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/gradient_teal_header"
-                android:padding="24dp">
+                android:paddingTop="28dp"
+                android:paddingBottom="28dp"
+                android:paddingHorizontal="24dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="140dp"
+                    android:src="@drawable/ic_launcher_circle"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Logo DermaBSA" />
 
                 <TextView
                     android:id="@+id/tvTotalBsa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     android:gravity="center"
