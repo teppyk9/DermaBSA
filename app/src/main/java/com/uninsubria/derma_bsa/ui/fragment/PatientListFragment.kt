@@ -4,8 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -20,15 +23,6 @@ import com.uninsubria.derma_bsa.model.PatientConBsa
 import com.uninsubria.derma_bsa.ui.adapter.PatientAdapter
 import kotlinx.coroutines.launch
 
-/**
- * Schermata con la lista dei pazienti passati e il pulsante per iniziare
- * una nuova sessione di misurazione.
- *
- * Ogni riga mostra nome, cognome e percentuale BSA totale. Cliccando su
- * una riga si apre il dettaglio del paziente ([PatientDetailFragment]).
- * Il pulsante "Nuova sessione" mostra un dialogo per inserire nome e
- * cognome del nuovo paziente, poi naviga a [BodyMapFragment].
- */
 class PatientListFragment : Fragment() {
 
     private var _binding: FragmentPatientListBinding? = null
@@ -61,13 +55,11 @@ class PatientListFragment : Fragment() {
         binding.btnNuovaSessione.setOnClickListener { mostraDialogoNuovoPaziente() }
     }
 
-    /**
-     * Mostra un dialogo con due campi EditText per inserire nome e cognome
-     * del nuovo paziente. Al click su "Crea", crea il paziente nel database
-     * e naviga a [BodyMapFragment].
-     */
     private fun mostraDialogoNuovoPaziente() {
         val padding = (16 * resources.displayMetrics.density).toInt()
+
+        val fasce = arrayOf("0-4 anni", "5-9 anni", "10-14 anni", "15+ anni")
+        val etaPerFascia = longArrayOf(2L, 7L, 12L, 20L)
 
         val layout = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
@@ -75,8 +67,23 @@ class PatientListFragment : Fragment() {
         }
         val etNome = EditText(requireContext()).apply { hint = "Nome" }
         val etCognome = EditText(requireContext()).apply { hint = "Cognome" }
+        val tvFascia = TextView(requireContext()).apply {
+            text = "Fascia d'età"
+            setPadding(0, padding / 2, 0, 0)
+        }
+        val spinner = Spinner(requireContext()).apply {
+            adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                fasce
+            )
+            setSelection(3) // default: 15+ anni
+        }
+
         layout.addView(etNome)
         layout.addView(etCognome)
+        layout.addView(tvFascia)
+        layout.addView(spinner)
 
         AlertDialog.Builder(requireContext())
             .setTitle("Nuovo paziente")
@@ -85,9 +92,10 @@ class PatientListFragment : Fragment() {
                 val nome = etNome.text.toString().trim()
                 val cognome = etCognome.text.toString().trim()
                 if (nome.isNotEmpty() && cognome.isNotEmpty()) {
+                    val eta = etaPerFascia[spinner.selectedItemPosition]
                     viewLifecycleOwner.lifecycleScope.launch {
-                        val id = viewModel.creaPaziente(nome, cognome)
-                        viewModel.impostaPatiente(id)
+                        val id = viewModel.creaPaziente(nome, cognome, eta)
+                        viewModel.impostaPatiente(id, eta)
                         viewModel.resetSession()
                         viewModel.creaSessione(id)
                         avviaBodyMap()
@@ -100,25 +108,15 @@ class PatientListFragment : Fragment() {
             .show()
     }
 
-    /**
-     * Apre il dettaglio di un paziente esistente.
-     *
-     * @param paziente paziente selezionato nella lista
-     */
     private fun apriDettaglio(paziente: PatientConBsa) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, PatientDetailFragment.newInstance(
-                paziente.id, paziente.nome, paziente.cognome
+                paziente.id, paziente.nome, paziente.cognome, paziente.dataNascita
             ))
             .addToBackStack(null)
             .commit()
     }
 
-    /**
-     * Naviga a [BodyMapFragment] per iniziare la misurazione del paziente corrente.
-     * Aggiunge il Fragment al back stack con il tag "bodymap" in modo che
-     * [ResultFragment] possa tornare qui dopo il salvataggio.
-     */
     private fun avviaBodyMap() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, BodyMapFragment())

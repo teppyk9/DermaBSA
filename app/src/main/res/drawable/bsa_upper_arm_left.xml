@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BSA: Upper Arm Left — Front 2% / Back 2% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="80dp"
+    android:viewportWidth="36"
+    android:viewportHeight="80">
+
+    <!-- Upper arm: slightly tapered rectangle -->
+    <path
+        android:pathData="M4,0 C2,0 0,4 0,8 L0,72 C0,76 2,80 6,80 L30,80 C34,80 36,76 36,72 L36,8 C36,4 34,0 32,0 Z"
+        android:fillColor="#BBDEFB"
+        android:strokeColor="#1565C0"
+        android:strokeWidth="1.5"/>
+</vector>

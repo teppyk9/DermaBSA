@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.uninsubria.derma_bsa.AppViewModel
@@ -67,10 +68,16 @@ class SelectionFragment : Fragment() {
         }
 
         binding.btnAnalyze.setOnClickListener {
-            val mask = if (binding.selectionCanvas.hasSelection())
-                binding.selectionCanvas.getSelectionMask()
-            else null
-            avviaAnalisi(selectionMask = mask)
+            if (!binding.selectionCanvas.hasSelection()) {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Nessuna area selezionata")
+                    .setMessage("Non hai disegnato nessuna area.\nVerrà analizzata l'intera immagine, come con Auto Detect.\n\nVuoi continuare?")
+                    .setPositiveButton("Continua") { _, _ -> avviaAnalisi(selectionMask = null) }
+                    .setNegativeButton("Annulla", null)
+                    .show()
+            } else {
+                avviaAnalisi(selectionMask = binding.selectionCanvas.getSelectionMask())
+            }
         }
     }
 

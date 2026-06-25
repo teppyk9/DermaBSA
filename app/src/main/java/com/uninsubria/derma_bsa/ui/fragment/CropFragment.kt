@@ -43,7 +43,7 @@ class CropFragment : Fragment() {
             return
         }
 
-        binding.cropOverlayView.regionId = region?.id ?: "trunk_front"
+        binding.cropOverlayView.regionId = region?.id ?: "torso_front"
         binding.cropOverlayView.image = bitmap
 
         binding.btnCropBack.setOnClickListener {

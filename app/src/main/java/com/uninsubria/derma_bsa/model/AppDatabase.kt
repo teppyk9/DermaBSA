@@ -7,16 +7,9 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-/**
- * Database Room dell'applicazione.
- *
- * Contiene le tabelle [Patient] (pazienti), [Session] (sessioni di visita) e
- * [Measurement] (misure BSA per distretto).
- * L'istanza è un singleton creato con doppio controllo per evitare istanze multiple.
- */
 @Database(
     entities = [Patient::class, Session::class, Measurement::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -59,12 +52,13 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
-        /**
-         * Restituisce l'istanza singleton del database, creandola se necessario.
-         *
-         * @param context contesto Android usato per creare il database
-         * @return istanza del database
-         */
+        // Aggiunge il campo dataNascita alla tabella pazienti
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE `pazienti` ADD COLUMN `dataNascita` INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -72,7 +66,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "derma_bsa.db"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build().also { INSTANCE = it }
             }
     }

@@ -74,7 +74,7 @@ class HomeFragment : Fragment() {
             }
         }
 
-        val pasi = BsaCalculator.percentualiPasi(misure)
+        val pasi = BsaCalculator.percentualiPasi(misure, viewModel.regionsPerPazienteCorrente())
         binding.tvPasi.text = if (pasi.isEmpty()) "-" else {
             pasi.entries.joinToString("\n") { (reg, perc) ->
                 "${reg.label}: ${"%.1f".format(perc)}% → area score ${BsaCalculator.pasiAreaScore(perc)}"

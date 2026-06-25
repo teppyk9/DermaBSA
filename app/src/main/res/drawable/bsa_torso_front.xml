@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BSA: Torso Front — 16.5% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="160dp"
+    android:viewportWidth="120"
+    android:viewportHeight="160">
+
+    <!-- Main torso body: trapezoid shape wider at shoulders, narrower at waist/hips -->
+    <path
+        android:pathData="M10,0
+                          L110,0
+                          L110,10
+                          C110,10 115,40 112,80
+                          C110,105 108,130 100,155
+                          L20,155
+                          C12,130 10,105 8,80
+                          C5,40 10,10 10,10
+                          Z"
+        android:fillColor="#BBDEFB"
+        android:strokeColor="#1565C0"
+        android:strokeWidth="1.5"/>
+</vector>

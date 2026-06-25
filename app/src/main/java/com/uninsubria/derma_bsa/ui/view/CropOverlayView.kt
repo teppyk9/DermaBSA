@@ -2,58 +2,57 @@ package com.uninsubria.derma_bsa.ui.view
 
 import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.VectorDrawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import com.uninsubria.derma_bsa.R
 import kotlin.math.atan2
 import kotlin.math.hypot
 
 /**
- * View personalizzata che mostra una foto con sovrapposta la sagoma del distretto
- * anatomico selezionato. L'utente può spostare, ridimensionare e ruotare la sagoma
- * tramite gesture touch, poi confermare il ritaglio.
+ * View personalizzata che mostra una foto con sovrapposta la sagoma SVG del
+ * distretto anatomico selezionato. L'utente può spostare, ridimensionare e
+ * ruotare la sagoma tramite gesture touch, poi confermare il ritaglio.
  *
  * Gesture supportate:
  * - 1 dito: traslazione della sagoma
  * - 2 dita: ridimensionamento e rotazione della sagoma
- *
- * Chiamare [cropImage] per ottenere la porzione di immagine ritagliata
- * nella forma della sagoma nella sua posizione corrente.
  */
 class CropOverlayView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
-    /**
-     * Identificatore del distretto anatomico da mostrare come sagoma.
-     * Cambiare questa proprietà ridisegna immediatamente la sagoma.
-     */
-    var regionId: String = "trunk_front"
-        set(value) { field = value; basePath.set(buildBasePath(value)); invalidate() }
+    var regionId: String = "torso_front"
+        set(value) {
+            field = value
+            overlayBitmap = renderDrawable(value)
+            overlayInitialized = false
+            if (width > 0 && height > 0) resetOverlay()
+            invalidate()
+        }
 
-    /**
-     * Immagine da mostrare come sfondo su cui posizionare la sagoma.
-     * Cambiare questa proprietà ricalcola la posizione iniziale della sagoma.
-     */
     var image: Bitmap? = null
-        set(value) { field = value; computeImageRect(); resetOverlay(); invalidate() }
+        set(value) {
+            field = value
+            computeImageRect()
+            overlayInitialized = false
+            resetOverlay()
+            invalidate()
+        }
 
-    private val basePath = Path()
+    private var overlayBitmap: Bitmap? = null
     private val overlayMatrix = Matrix()
     private var imageRect = RectF()
     private var overlayInitialized = false
 
-    private val imagePaint  = Paint(Paint.FILTER_BITMAP_FLAG)
-    private val fillPaint   = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0x550000FF
-        style = Paint.Style.FILL
+    private val imagePaint = Paint(Paint.FILTER_BITMAP_FLAG)
+    private val overlayPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        alpha = 180
+        colorFilter = PorterDuffColorFilter(0xFF1565C0.toInt(), PorterDuff.Mode.SRC_ATOP)
     }
-    private val strokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xCC2979FF.toInt()
-        style = Paint.Style.STROKE
-        strokeWidth = 6f
-    }
-    private val hintPaint   = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val hintPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = 0xCCFFFFFF.toInt()
         textAlign = Paint.Align.CENTER
         textSize = 36f
@@ -64,7 +63,44 @@ class CropOverlayView @JvmOverloads constructor(
     private var activePointers = 0
 
     init {
-        basePath.set(buildBasePath("trunk_front"))
+        overlayBitmap = renderDrawable("torso_front")
+    }
+
+    /** Rende il VectorDrawable corrispondente al regionId in un Bitmap trasparente. */
+    private fun renderDrawable(regionId: String): Bitmap? {
+        val resId = drawableForRegion(regionId) ?: return null
+        val drawable = ContextCompat.getDrawable(context, resId) as? VectorDrawable ?: return null
+        val w = drawable.intrinsicWidth.takeIf { it > 0 } ?: 80
+        val h = drawable.intrinsicHeight.takeIf { it > 0 } ?: 80
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        drawable.setBounds(0, 0, w, h)
+        drawable.draw(canvas)
+        return bmp
+    }
+
+    /** Mappa il regionId al drawable resource corrispondente. */
+    private fun drawableForRegion(id: String): Int? = when {
+        id.startsWith("head")             -> R.drawable.bsa_head
+        id.startsWith("neck")             -> R.drawable.bsa_neck
+        id == "torso_front"               -> R.drawable.bsa_torso_front
+        id == "torso_back"                -> R.drawable.bsa_torso_back
+        id == "groin"                     -> R.drawable.bsa_groin
+        id == "gluteus_left"              -> R.drawable.bsa_gluteus_left
+        id == "gluteus_right"             -> R.drawable.bsa_gluteus_right
+        id.startsWith("upper_arm_left")   -> R.drawable.bsa_upper_arm_left
+        id.startsWith("upper_arm_right")  -> R.drawable.bsa_upper_arm_right
+        id.startsWith("forearm_left")     -> R.drawable.bsa_forearm_left
+        id.startsWith("forearm_right")    -> R.drawable.bsa_forearm_right
+        id.startsWith("hand_left")        -> R.drawable.bsa_hand_left
+        id.startsWith("hand_right")       -> R.drawable.bsa_hand_right
+        id.startsWith("thigh_left")       -> R.drawable.bsa_thigh_left
+        id.startsWith("thigh_right")      -> R.drawable.bsa_thigh_right
+        id.startsWith("lower_leg_left")   -> R.drawable.bsa_lower_leg_left
+        id.startsWith("lower_leg_right")  -> R.drawable.bsa_lower_leg_right
+        id.startsWith("foot_left")        -> R.drawable.bsa_foot_left
+        id.startsWith("foot_right")       -> R.drawable.bsa_foot_right
+        else                              -> null
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldW: Int, oldH: Int) {
@@ -73,10 +109,6 @@ class CropOverlayView @JvmOverloads constructor(
         if (!overlayInitialized) resetOverlay()
     }
 
-    /**
-     * Calcola il rettangolo all'interno della View in cui viene disegnata l'immagine,
-     * mantenendo le proporzioni originali (letterbox/pillarbox).
-     */
     private fun computeImageRect() {
         val img = image ?: return
         if (width == 0 || height == 0) return
@@ -93,22 +125,20 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
-    /**
-     * Posiziona la sagoma al centro dell'immagine con una dimensione iniziale pari
-     * al 45% del lato più corto del rettangolo immagine.
-     */
+    /** Posiziona la sagoma al centro dell'immagine scalata in modo che
+     *  occupi circa il 55% del lato più corto del rettangolo immagine. */
     private fun resetOverlay() {
+        val bmp = overlayBitmap ?: return
         if (width == 0 || height == 0) return
         overlayMatrix.reset()
         val refRect = if (imageRect.isEmpty) RectF(0f, 0f, width.toFloat(), height.toFloat()) else imageRect
-        val s = when (regionId) {
-            "arm_left", "arm_right", "leg_left", "leg_right" ->
-                maxOf(refRect.width(), refRect.height()) * 0.62f
-            else ->
-                minOf(refRect.width(), refRect.height()) * 0.45f
-        }
-        val cx = refRect.centerX()
-        val cy = refRect.centerY()
+
+        val scaleX = refRect.width()  * 0.55f / bmp.width
+        val scaleY = refRect.height() * 0.55f / bmp.height
+        val s = minOf(scaleX, scaleY)
+
+        val cx = refRect.centerX() - bmp.width  * s / 2f
+        val cy = refRect.centerY() - bmp.height * s / 2f
         overlayMatrix.postScale(s, s)
         overlayMatrix.postTranslate(cx, cy)
         overlayInitialized = true
@@ -118,10 +148,12 @@ class CropOverlayView @JvmOverloads constructor(
         super.onDraw(canvas)
         image?.let { canvas.drawBitmap(it, null, imageRect, imagePaint) }
 
-        val rendered = Path()
-        basePath.transform(overlayMatrix, rendered)
-        canvas.drawPath(rendered, fillPaint)
-        canvas.drawPath(rendered, strokePaint)
+        overlayBitmap?.let { bmp ->
+            canvas.save()
+            canvas.concat(overlayMatrix)
+            canvas.drawBitmap(bmp, 0f, 0f, overlayPaint)
+            canvas.restore()
+        }
 
         if (image != null) {
             canvas.drawText("Posiziona e ridimensiona la sagoma", width / 2f, height - 24f, hintPaint)
@@ -139,10 +171,7 @@ class CropOverlayView @JvmOverloads constructor(
                 p1x = event.getX(1); p1y = event.getY(1)
                 activePointers = 2
             }
-            MotionEvent.ACTION_MOVE -> {
-                handleMove(event)
-                invalidate()
-            }
+            MotionEvent.ACTION_MOVE -> { handleMove(event); invalidate() }
             MotionEvent.ACTION_POINTER_UP -> {
                 activePointers = 1
                 val remaining = if (event.actionIndex == 0) 1 else 0
@@ -181,79 +210,80 @@ class CropOverlayView @JvmOverloads constructor(
     }
 
     /**
-     * Ritaglia l'immagine nella forma e nella posizione corrente della sagoma.
+     * Ritaglia l'immagine nella forma e posizione corrente della sagoma SVG.
      *
-     * Mappa il path dal sistema di coordinate della View a quello dell'immagine originale,
-     * applica il path come clip e disegna l'immagine su un nuovo Bitmap.
-     * Restituisce anche l'overlap ratio: la frazione della sagoma che cade dentro
-     * i bordi dell'immagine (es. 0.5 se solo metà sagoma è visibile nella foto).
-     *
-     * @return coppia (bitmap ritagliato, overlapRatio 0..1), oppure `null` se non c'è immagine
+     * La sagoma trasformata viene usata come maschera alpha (DST_IN) per
+     * ritagliare la foto. Restituisce anche l'overlapRatio (frazione della
+     * sagoma che cade dentro i bordi della foto).
      */
     fun cropImage(): Pair<Bitmap, Float>? {
         val img = image ?: return null
+        val bmp = overlayBitmap ?: return null
         if (imageRect.isEmpty) return null
 
-        val imageToView = Matrix()
-        imageToView.setRectToRect(
-            RectF(0f, 0f, img.width.toFloat(), img.height.toFloat()),
-            imageRect,
-            Matrix.ScaleToFit.FILL
+        // Matrice da view a image
+        val imageToView = Matrix().apply {
+            setRectToRect(
+                RectF(0f, 0f, img.width.toFloat(), img.height.toFloat()),
+                imageRect,
+                Matrix.ScaleToFit.FILL
+            )
+        }
+        val viewToImage = Matrix().also { imageToView.invert(it) }
+
+        // overlayMatrix: bitmap coords → view coords
+        // bmpToImage: bitmap coords → image coords
+        val bmpToImage = Matrix(overlayMatrix).apply { postConcat(viewToImage) }
+
+        // Bounding box dei 4 angoli del bitmap nel sistema immagine
+        val corners = floatArrayOf(
+            0f, 0f,
+            bmp.width.toFloat(), 0f,
+            bmp.width.toFloat(), bmp.height.toFloat(),
+            0f, bmp.height.toFloat()
         )
-        val viewToImage = Matrix()
-        imageToView.invert(viewToImage)
+        bmpToImage.mapPoints(corners)
 
-        val viewPath = Path()
-        basePath.transform(overlayMatrix, viewPath)
-        val imagePath = Path()
-        viewPath.transform(viewToImage, imagePath)
+        val minX = minOf(corners[0], corners[2], corners[4], corners[6])
+        val maxX = maxOf(corners[0], corners[2], corners[4], corners[6])
+        val minY = minOf(corners[1], corners[3], corners[5], corners[7])
+        val maxY = maxOf(corners[1], corners[3], corners[5], corners[7])
+        val fullBounds = RectF(minX, minY, maxX, maxY)
 
-        val fullBounds = RectF()
-        imagePath.computeBounds(fullBounds, true)
-
-        val bounds = RectF(fullBounds)
-        val hasOverlap = bounds.intersect(0f, 0f, img.width.toFloat(), img.height.toFloat())
-        if (!hasOverlap || bounds.isEmpty) return null
+        val clipped = RectF(fullBounds)
+        val hasOverlap = clipped.intersect(0f, 0f, img.width.toFloat(), img.height.toFloat())
+        if (!hasOverlap || clipped.isEmpty) return null
 
         val fullArea    = fullBounds.width() * fullBounds.height()
-        val clippedArea = bounds.width() * bounds.height()
+        val clippedArea = clipped.width()    * clipped.height()
         val overlapRatio = if (fullArea > 0f) (clippedArea / fullArea).coerceIn(0f, 1f) else 1f
 
-        val cropW  = bounds.width().toInt().coerceAtLeast(1)
-        val cropH  = bounds.height().toInt().coerceAtLeast(1)
-        val result = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(result)
-        canvas.translate(-bounds.left, -bounds.top)
-        canvas.clipPath(imagePath)
-        canvas.drawBitmap(img, 0f, 0f, null)
-        return Pair(result, overlapRatio)
-    }
+        val cropW = clipped.width().toInt().coerceAtLeast(1)
+        val cropH = clipped.height().toInt().coerceAtLeast(1)
 
-    /**
-     * Restituisce il path base della sagoma nel sistema di coordinate normalizzato
-     * (asse -0.5..0.5), con le proporzioni anatomiche del distretto specificato.
-     *
-     * @param regionId identificatore del distretto
-     * @return path normalizzato della sagoma
-     */
-    private fun buildBasePath(regionId: String): Path = when (regionId) {
-        "head"                      -> Path().apply {
-            addOval(RectF(-0.5f, -0.36f, 0.5f, 0.36f), Path.Direction.CW)
+        // 1. Ritaglia la foto nella bounding box della sagoma
+        val photoCrop = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
+        Canvas(photoCrop).apply {
+            translate(-clipped.left, -clipped.top)
+            drawBitmap(img, 0f, 0f, null)
         }
-        "trunk_front", "trunk_back" -> Path().apply {
-            addRoundRect(RectF(-0.375f, -0.5f, 0.375f, 0.5f), 0.08f, 0.08f, Path.Direction.CW)
+
+        // 2. Disegna la sagoma trasformata nel sistema delle coordinate del crop
+        val maskBmp = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
+        val maskMatrix = Matrix(bmpToImage).apply {
+            postTranslate(-clipped.left, -clipped.top)
         }
-        "arm_left", "arm_right"     -> Path().apply {
-            addRoundRect(RectF(-0.09f, -0.5f, 0.09f, 0.5f), 0.06f, 0.06f, Path.Direction.CW)
-        }
-        "genitals"                  -> Path().apply {
-            addRoundRect(RectF(-0.5f, -0.25f, 0.5f, 0.25f), 0.1f, 0.1f, Path.Direction.CW)
-        }
-        "leg_left", "leg_right"     -> Path().apply {
-            addRoundRect(RectF(-0.065f, -0.5f, 0.065f, 0.5f), 0.04f, 0.04f, Path.Direction.CW)
-        }
-        else                        -> Path().apply {
-            addRoundRect(RectF(-0.5f, -0.5f, 0.5f, 0.5f), 0.1f, 0.1f, Path.Direction.CW)
-        }
+        Canvas(maskBmp).drawBitmap(bmp, maskMatrix, Paint(Paint.ANTI_ALIAS_FLAG))
+
+        // 3. Applica la maschera alpha alla foto (DST_IN)
+        val result = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
+        val resultCanvas = Canvas(result)
+        resultCanvas.drawBitmap(photoCrop, 0f, 0f, null)
+        resultCanvas.drawBitmap(
+            maskBmp, 0f, 0f,
+            Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN) }
+        )
+
+        return Pair(result, overlapRatio)
     }
 }

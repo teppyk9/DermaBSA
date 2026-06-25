@@ -5,6 +5,7 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import java.io.File
 import java.nio.FloatBuffer
 import kotlin.math.exp
@@ -87,8 +88,12 @@ object OnnxHelper {
         tensor.close()
         output.close()
 
+        // Calcola i valori sigmoid per tutti i pixel prima di applicare la soglia
+        val sigmoidValues = FloatArray(size * size) { i -> sigmoid(raw[i / size][i % size]) }
+        val threshold = adaptiveThreshold(sigmoidValues)
+
         val outPx = IntArray(size * size) { i ->
-            if (sigmoid(raw[i / size][i % size]) > 0.5f) 0x77FF0000.toInt() else 0x00000000
+            if (sigmoidValues[i] > threshold) 0x77FF0000.toInt() else 0x00000000
         }
         val mask = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
         mask.setPixels(outPx, 0, size, 0, 0, size, size)
@@ -98,14 +103,19 @@ object OnnxHelper {
     /**
      * Esegue la segmentazione limitandola all'area selezionata manualmente dall'utente.
      *
-     * Se [selectionMask] non è `null`, i pixel dell'immagine che cadono fuori dalla
-     * maschera vengono sostituiti con nero prima di passare il bitmap a [segment].
-     * In questo modo il modello "vede" solo la zona di interesse.
+     * Quando è presente una [selectionMask], calcola il bounding box minimo che contiene
+     * tutta l'area disegnata e ritaglia l'immagine a quella zona. Il ritaglio viene poi
+     * scalato a 512×512 prima di passare al modello, in modo che tutti i pixel di input
+     * siano usati per l'area di interesse anziché per sfondo nero.
+     *
+     * Il risultato viene riproiettato nelle coordinate dell'immagine originale e restituito
+     * come bitmap delle stesse dimensioni di [bitmap], così il calcolo BSA rimane corretto.
+     *
      * Se [selectionMask] è `null` la segmentazione viene eseguita sull'intera immagine.
      *
      * @param bitmap immagine ritagliata da analizzare
      * @param selectionMask maschera bianca su trasparente disegnata dall'utente, oppure `null`
-     * @return maschera 512×512 con le lesioni evidenziate in rosso
+     * @return maschera delle stesse dimensioni di [bitmap] con le lesioni evidenziate in rosso
      */
     fun segmentWithMask(bitmap: Bitmap, selectionMask: Bitmap?): Bitmap {
         if (selectionMask == null) return segment(bitmap)
@@ -117,32 +127,123 @@ object OnnxHelper {
         val maskPx = IntArray(w * h)
         scaledMask.getPixels(maskPx, 0, w, 0, 0, w, h)
 
+        // Trova il bounding box minimo della selezione dell'utente
+        var minX = w; var maxX = 0
+        var minY = h; var maxY = 0
+        for (y in 0 until h) {
+            for (x in 0 until w) {
+                if ((maskPx[y * w + x] ushr 24) > 0) {
+                    if (x < minX) minX = x
+                    if (x > maxX) maxX = x
+                    if (y < minY) minY = y
+                    if (y > maxY) maxY = y
+                }
+            }
+        }
+
+        // Nessun pixel selezionato: analisi su tutta l'immagine come fallback
+        if (minX > maxX || minY > maxY) return segment(bitmap)
+
+        val bboxW = maxX - minX + 1
+        val bboxH = maxY - minY + 1
+
+        // Applica la maschera all'immagine sorgente: pixel fuori selezione → nero
         val srcPx = IntArray(w * h)
         bitmap.getPixels(srcPx, 0, w, 0, 0, w, h)
-
         for (i in maskPx.indices) {
             if ((maskPx[i] ushr 24) == 0) srcPx[i] = 0xFF000000.toInt()
         }
 
-        val masked = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
-        masked.setPixels(srcPx, 0, w, 0, 0, w, h)
-        return segment(masked)
+        // Estrai solo la regione del bounding box
+        val bboxPx = IntArray(bboxW * bboxH)
+        for (y in 0 until bboxH)
+            for (x in 0 until bboxW)
+                bboxPx[y * bboxW + x] = srcPx[(minY + y) * w + (minX + x)]
+
+        val bboxBitmap = Bitmap.createBitmap(bboxW, bboxH, Bitmap.Config.ARGB_8888)
+        bboxBitmap.setPixels(bboxPx, 0, bboxW, 0, 0, bboxW, bboxH)
+
+        // Inferenza: il modello vede 512×512 tutti dedicati alla zona di interesse
+        val bboxMask = segment(bboxBitmap)
+
+        // Riproietta il risultato nelle coordinate dell'immagine originale
+        val scaledResult = Bitmap.createScaledBitmap(bboxMask, bboxW, bboxH, false)
+        val fullMask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)  // tutto trasparente
+        Canvas(fullMask).drawBitmap(scaledResult, minX.toFloat(), minY.toFloat(), null)
+
+        return fullMask
     }
 
     /**
      * Calcola il contributo percentuale al BSA totale del distretto misurato.
      *
-     * @param mask maschera 512×512 prodotta da [segment] o [segmentWithMask]
+     * Conta i pixel con alpha > 0 nella maschera (lesioni rilevate) e ne calcola
+     * la proporzione rispetto all'area totale della maschera. Funziona correttamente
+     * sia con maschere 512×512 (auto detect) sia con maschere a dimensione originale
+     * (selezione manuale con bounding box).
+     *
+     * @param mask maschera prodotta da [segment] o [segmentWithMask]
      * @param regionBsaPercent percentuale BSA del distretto (es. 18.0 per il tronco)
      * @return contributo BSA del distretto in percentuale (0–regionBsaPercent)
      */
     fun calcBsa(mask: Bitmap, regionBsaPercent: Float): Float {
-        var lesionPixels = 0
-        for (y in 0 until mask.height)
-            for (x in 0 until mask.width)
-                if ((mask.getPixel(x, y) shr 24 and 0xFF) > 0) lesionPixels++
-        return regionBsaPercent * (lesionPixels.toFloat() / (mask.width * mask.height))
+        val pixels = IntArray(mask.width * mask.height)
+        mask.getPixels(pixels, 0, mask.width, 0, 0, mask.width, mask.height)
+        val lesionPixels = pixels.count { (it ushr 24) > 0 }
+        return regionBsaPercent * (lesionPixels.toFloat() / pixels.size)
     }
 
     private fun sigmoid(x: Float) = 1f / (1f + exp(-x))
+
+    /**
+     * Calcola una soglia di binarizzazione adattiva con il metodo di Otsu sui valori
+     * sigmoid prodotti dal modello, anziché usare 0.5 fisso.
+     *
+     * Otsu trova la soglia che minimizza la varianza intra-classe tra i due gruppi
+     * (sfondo e lesione), cercando la separazione ottimale nella distribuzione
+     * dei valori di confidenza. Il floor a 0.5 evita falsi positivi quando
+     * il modello è incerto (distribuzione piatta o sbilanciata verso lo sfondo).
+     *
+     * @param values array di valori sigmoid in [0, 1], uno per pixel
+     * @return soglia in [0.5, 1.0]
+     */
+    private fun adaptiveThreshold(values: FloatArray, numBins: Int = 256): Float {
+        val hist = IntArray(numBins)
+        for (v in values) {
+            val bin = (v * (numBins - 1)).toInt().coerceIn(0, numBins - 1)
+            hist[bin]++
+        }
+
+        val total = values.size.toFloat()
+        var sumAll = 0f
+        for (i in hist.indices) sumAll += i * hist[i]
+
+        var sumBackground = 0f
+        var countBackground = 0
+        var bestVariance = 0f
+        var bestThreshold = 0.5f
+
+        for (t in hist.indices) {
+            countBackground += hist[t]
+            if (countBackground == 0) continue
+            val countForeground = total - countBackground
+            if (countForeground <= 0f) break
+
+            sumBackground += t * hist[t]
+            val meanBackground = sumBackground / countBackground
+            val meanForeground = (sumAll - sumBackground) / countForeground
+
+            val variance = countBackground * countForeground *
+                    (meanBackground - meanForeground) * (meanBackground - meanForeground)
+
+            if (variance > bestVariance) {
+                bestVariance = variance
+                bestThreshold = t.toFloat() / (numBins - 1)
+            }
+        }
+
+        // Soglia libera tra 0.2 e 0.4: range volutamente più basso di 0.5
+        // per catturare anche alterazioni cromatiche tenui
+        return bestThreshold.coerceIn(0.2f, 0.4f)
+    }
 }

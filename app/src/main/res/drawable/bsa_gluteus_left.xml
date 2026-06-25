@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BSA: Gluteus Left — Back only 2.5% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="55dp"
+    android:height="40dp"
+    android:viewportWidth="55"
+    android:viewportHeight="40">
+
+    <!-- Left gluteus: rounded shape -->
+    <path
+        android:pathData="M2,0 L53,0 L55,15 C55,30 45,40 28,40 C10,40 0,30 0,15 Z"
+        android:fillColor="#BBDEFB"
+        android:strokeColor="#1565C0"
+        android:strokeWidth="1.5"/>
+</vector>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BSA: Thigh Left — Front 4.5% / Back 4.5% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="50dp"
+    android:height="100dp"
+    android:viewportWidth="50"
+    android:viewportHeight="100">
+
+    <!-- Thigh: wider at top (hip), narrower at knee -->
+    <path
+        android:pathData="M2,0 L48,0 C49,0 50,2 50,5 L50,90 C50,96 46,100 40,100 L10,100 C4,100 0,96 0,90 L0,5 C0,2 1,0 2,0 Z"
+        android:fillColor="#BBDEFB"
+        android:strokeColor="#1565C0"
+        android:strokeWidth="1.5"/>
+</vector>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BSA: Lower Leg Right — Front 4% / Back 4% -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="44dp"
+    android:height="95dp"
+    android:viewportWidth="44"
+    android:viewportHeight="95">
+
+    <!-- Same as left lower leg -->
+    <path
+        android:pathData="M4,0 L40,0 C42,0 44,2 44,5
+                          L44,45 C44,55 42,60 38,65
+                          L38,88 C38,92 35,95 30,95
+                          L14,95 C9,95 6,92 6,88
+                          L6,65 C2,60 0,55 0,45
+                          L0,5 C0,2 2,0 4,0 Z"
+        android:fillColor="#BBDEFB"
+        android:strokeColor="#1565C0"
+        android:strokeWidth="1.5"/>
+</vector>

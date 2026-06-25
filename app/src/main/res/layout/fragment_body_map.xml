@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -39,11 +40,404 @@
 
     </RadioGroup>
 
-    <com.uninsubria.derma_bsa.ui.view.BodyMapView
-        android:id="@+id/bodyMap"
+    <!-- Corpo umano scorrevole, centrato orizzontalmente -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:fillViewport="false">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="8dp">
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- VISTA FRONTALE                                          -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bodyFront"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="16dp"
+                android:visibility="visible">
+
+                <ImageView android:id="@+id/front_head"
+                    android:layout_width="74dp" android:layout_height="76dp"
+                    android:src="@drawable/bsa_head"
+                    android:contentDescription="Testa" android:tag="head"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView android:id="@+id/front_neck"
+                    android:layout_width="30dp" android:layout_height="22dp"
+                    android:src="@drawable/bsa_neck"
+                    android:contentDescription="Collo" android:tag="neck"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_head"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <ImageView android:id="@+id/front_torso"
+                    android:layout_width="110dp" android:layout_height="136dp"
+                    android:src="@drawable/bsa_torso_front"
+                    android:contentDescription="Busto anteriore" android:tag="torso_front"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_neck"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <ImageView android:id="@+id/front_groin"
+                    android:layout_width="56dp" android:layout_height="26dp"
+                    android:src="@drawable/bsa_groin"
+                    android:contentDescription="Inguine" android:tag="groin"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_torso"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Braccio sup. sinistro -->
+                <ImageView android:id="@+id/front_upper_arm_left"
+                    android:layout_width="33dp" android:layout_height="74dp"
+                    android:src="@drawable/bsa_upper_arm_left"
+                    android:contentDescription="Braccio superiore sinistro" android:tag="upper_arm_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_neck"
+                    app:layout_constraintEnd_toStartOf="@id/front_torso"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="-4dp" />
+
+                <!-- Braccio sup. destro -->
+                <ImageView android:id="@+id/front_upper_arm_right"
+                    android:layout_width="33dp" android:layout_height="74dp"
+                    android:src="@drawable/bsa_upper_arm_right"
+                    android:contentDescription="Braccio superiore destro" android:tag="upper_arm_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_neck"
+                    app:layout_constraintStart_toEndOf="@id/front_torso"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="-4dp" />
+
+                <!-- Avambraccio sinistro -->
+                <ImageView android:id="@+id/front_forearm_left"
+                    android:layout_width="30dp" android:layout_height="66dp"
+                    android:src="@drawable/bsa_forearm_left"
+                    android:contentDescription="Avambraccio sinistro" android:tag="forearm_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_upper_arm_left"
+                    app:layout_constraintStart_toStartOf="@id/front_upper_arm_left"
+                    app:layout_constraintEnd_toEndOf="@id/front_upper_arm_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Avambraccio destro -->
+                <ImageView android:id="@+id/front_forearm_right"
+                    android:layout_width="30dp" android:layout_height="66dp"
+                    android:src="@drawable/bsa_forearm_right"
+                    android:contentDescription="Avambraccio destro" android:tag="forearm_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_upper_arm_right"
+                    app:layout_constraintStart_toStartOf="@id/front_upper_arm_right"
+                    app:layout_constraintEnd_toEndOf="@id/front_upper_arm_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Mano sinistra -->
+                <ImageView android:id="@+id/front_hand_left"
+                    android:layout_width="26dp" android:layout_height="44dp"
+                    android:src="@drawable/bsa_hand_left"
+                    android:contentDescription="Mano sinistra" android:tag="hand_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_forearm_left"
+                    app:layout_constraintStart_toStartOf="@id/front_forearm_left"
+                    app:layout_constraintEnd_toEndOf="@id/front_forearm_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Mano destra -->
+                <ImageView android:id="@+id/front_hand_right"
+                    android:layout_width="26dp" android:layout_height="44dp"
+                    android:src="@drawable/bsa_hand_right"
+                    android:contentDescription="Mano destra" android:tag="hand_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_forearm_right"
+                    app:layout_constraintStart_toStartOf="@id/front_forearm_right"
+                    app:layout_constraintEnd_toEndOf="@id/front_forearm_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Coscia sinistra -->
+                <ImageView android:id="@+id/front_thigh_left"
+                    android:layout_width="46dp" android:layout_height="88dp"
+                    android:src="@drawable/bsa_thigh_left"
+                    android:contentDescription="Coscia sinistra" android:tag="thigh_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_groin"
+                    app:layout_constraintEnd_toStartOf="@id/front_thigh_right"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Coscia destra -->
+                <ImageView android:id="@+id/front_thigh_right"
+                    android:layout_width="46dp" android:layout_height="88dp"
+                    android:src="@drawable/bsa_thigh_right"
+                    android:contentDescription="Coscia destra" android:tag="thigh_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_groin"
+                    app:layout_constraintStart_toEndOf="@id/front_thigh_left"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gamba inf. sinistra -->
+                <ImageView android:id="@+id/front_lower_leg_left"
+                    android:layout_width="41dp" android:layout_height="83dp"
+                    android:src="@drawable/bsa_lower_leg_left"
+                    android:contentDescription="Gamba inferiore sinistra" android:tag="lower_leg_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_thigh_left"
+                    app:layout_constraintStart_toStartOf="@id/front_thigh_left"
+                    app:layout_constraintEnd_toEndOf="@id/front_thigh_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gamba inf. destra -->
+                <ImageView android:id="@+id/front_lower_leg_right"
+                    android:layout_width="41dp" android:layout_height="83dp"
+                    android:src="@drawable/bsa_lower_leg_right"
+                    android:contentDescription="Gamba inferiore destra" android:tag="lower_leg_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_thigh_right"
+                    app:layout_constraintStart_toStartOf="@id/front_thigh_right"
+                    app:layout_constraintEnd_toEndOf="@id/front_thigh_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Piede sinistro -->
+                <ImageView android:id="@+id/front_foot_left"
+                    android:layout_width="56dp" android:layout_height="24dp"
+                    android:src="@drawable/bsa_foot_left"
+                    android:contentDescription="Piede sinistro" android:tag="foot_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_lower_leg_left"
+                    app:layout_constraintEnd_toEndOf="@id/front_lower_leg_left"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginEnd="10dp" />
+
+                <!-- Piede destro -->
+                <ImageView android:id="@+id/front_foot_right"
+                    android:layout_width="56dp" android:layout_height="24dp"
+                    android:src="@drawable/bsa_foot_right"
+                    android:contentDescription="Piede destro" android:tag="foot_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/front_lower_leg_right"
+                    app:layout_constraintStart_toStartOf="@id/front_lower_leg_right"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginStart="10dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <!-- VISTA POSTERIORE                                        -->
+            <!-- ═══════════════════════════════════════════════════════ -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bodyBack"
+                android:layout_width="240dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:paddingBottom="16dp"
+                android:visibility="gone">
+
+                <ImageView android:id="@+id/back_head"
+                    android:layout_width="74dp" android:layout_height="76dp"
+                    android:src="@drawable/bsa_head"
+                    android:contentDescription="Testa posteriore" android:tag="head"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+
+                <ImageView android:id="@+id/back_neck"
+                    android:layout_width="30dp" android:layout_height="22dp"
+                    android:src="@drawable/bsa_neck"
+                    android:contentDescription="Collo posteriore" android:tag="neck"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_head"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <ImageView android:id="@+id/back_torso"
+                    android:layout_width="110dp" android:layout_height="136dp"
+                    android:src="@drawable/bsa_torso_back"
+                    android:contentDescription="Busto posteriore" android:tag="torso_back"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_neck"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gluteo sinistro -->
+                <ImageView android:id="@+id/back_gluteus_left"
+                    android:layout_width="51dp" android:layout_height="35dp"
+                    android:src="@drawable/bsa_gluteus_left"
+                    android:contentDescription="Gluteo sinistro" android:tag="gluteus_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_torso"
+                    app:layout_constraintEnd_toStartOf="@id/back_gluteus_right"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gluteo destro -->
+                <ImageView android:id="@+id/back_gluteus_right"
+                    android:layout_width="51dp" android:layout_height="35dp"
+                    android:src="@drawable/bsa_gluteus_right"
+                    android:contentDescription="Gluteo destro" android:tag="gluteus_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_torso"
+                    app:layout_constraintStart_toEndOf="@id/back_gluteus_left"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Braccio sup. sinistro -->
+                <ImageView android:id="@+id/back_upper_arm_left"
+                    android:layout_width="33dp" android:layout_height="74dp"
+                    android:src="@drawable/bsa_upper_arm_left"
+                    android:contentDescription="Braccio superiore sinistro posteriore" android:tag="upper_arm_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_neck"
+                    app:layout_constraintEnd_toStartOf="@id/back_torso"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginEnd="-4dp" />
+
+                <!-- Braccio sup. destro -->
+                <ImageView android:id="@+id/back_upper_arm_right"
+                    android:layout_width="33dp" android:layout_height="74dp"
+                    android:src="@drawable/bsa_upper_arm_right"
+                    android:contentDescription="Braccio superiore destro posteriore" android:tag="upper_arm_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_neck"
+                    app:layout_constraintStart_toEndOf="@id/back_torso"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginStart="-4dp" />
+
+                <!-- Avambraccio sinistro -->
+                <ImageView android:id="@+id/back_forearm_left"
+                    android:layout_width="30dp" android:layout_height="66dp"
+                    android:src="@drawable/bsa_forearm_left"
+                    android:contentDescription="Avambraccio sinistro posteriore" android:tag="forearm_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_upper_arm_left"
+                    app:layout_constraintStart_toStartOf="@id/back_upper_arm_left"
+                    app:layout_constraintEnd_toEndOf="@id/back_upper_arm_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Avambraccio destro -->
+                <ImageView android:id="@+id/back_forearm_right"
+                    android:layout_width="30dp" android:layout_height="66dp"
+                    android:src="@drawable/bsa_forearm_right"
+                    android:contentDescription="Avambraccio destro posteriore" android:tag="forearm_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_upper_arm_right"
+                    app:layout_constraintStart_toStartOf="@id/back_upper_arm_right"
+                    app:layout_constraintEnd_toEndOf="@id/back_upper_arm_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Mano sinistra -->
+                <ImageView android:id="@+id/back_hand_left"
+                    android:layout_width="26dp" android:layout_height="44dp"
+                    android:src="@drawable/bsa_hand_left"
+                    android:contentDescription="Mano sinistra posteriore" android:tag="hand_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_forearm_left"
+                    app:layout_constraintStart_toStartOf="@id/back_forearm_left"
+                    app:layout_constraintEnd_toEndOf="@id/back_forearm_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Mano destra -->
+                <ImageView android:id="@+id/back_hand_right"
+                    android:layout_width="26dp" android:layout_height="44dp"
+                    android:src="@drawable/bsa_hand_right"
+                    android:contentDescription="Mano destra posteriore" android:tag="hand_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_forearm_right"
+                    app:layout_constraintStart_toStartOf="@id/back_forearm_right"
+                    app:layout_constraintEnd_toEndOf="@id/back_forearm_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Coscia sinistra -->
+                <ImageView android:id="@+id/back_thigh_left"
+                    android:layout_width="46dp" android:layout_height="88dp"
+                    android:src="@drawable/bsa_thigh_left"
+                    android:contentDescription="Coscia sinistra posteriore" android:tag="thigh_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_gluteus_left"
+                    app:layout_constraintStart_toStartOf="@id/back_gluteus_left"
+                    app:layout_constraintEnd_toEndOf="@id/back_gluteus_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Coscia destra -->
+                <ImageView android:id="@+id/back_thigh_right"
+                    android:layout_width="46dp" android:layout_height="88dp"
+                    android:src="@drawable/bsa_thigh_right"
+                    android:contentDescription="Coscia destra posteriore" android:tag="thigh_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_gluteus_right"
+                    app:layout_constraintStart_toStartOf="@id/back_gluteus_right"
+                    app:layout_constraintEnd_toEndOf="@id/back_gluteus_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gamba inf. sinistra -->
+                <ImageView android:id="@+id/back_lower_leg_left"
+                    android:layout_width="41dp" android:layout_height="83dp"
+                    android:src="@drawable/bsa_lower_leg_left"
+                    android:contentDescription="Gamba inferiore sinistra posteriore" android:tag="lower_leg_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_thigh_left"
+                    app:layout_constraintStart_toStartOf="@id/back_thigh_left"
+                    app:layout_constraintEnd_toEndOf="@id/back_thigh_left"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Gamba inf. destra -->
+                <ImageView android:id="@+id/back_lower_leg_right"
+                    android:layout_width="41dp" android:layout_height="83dp"
+                    android:src="@drawable/bsa_lower_leg_right"
+                    android:contentDescription="Gamba inferiore destra posteriore" android:tag="lower_leg_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_thigh_right"
+                    app:layout_constraintStart_toStartOf="@id/back_thigh_right"
+                    app:layout_constraintEnd_toEndOf="@id/back_thigh_right"
+                    android:layout_marginTop="-2dp" />
+
+                <!-- Piede sinistro -->
+                <ImageView android:id="@+id/back_foot_left"
+                    android:layout_width="56dp" android:layout_height="24dp"
+                    android:src="@drawable/bsa_foot_left"
+                    android:contentDescription="Piede sinistro posteriore" android:tag="foot_left"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_lower_leg_left"
+                    app:layout_constraintEnd_toEndOf="@id/back_lower_leg_left"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginEnd="20dp" />
+
+                <!-- Piede destro -->
+                <ImageView android:id="@+id/back_foot_right"
+                    android:layout_width="56dp" android:layout_height="24dp"
+                    android:src="@drawable/bsa_foot_right"
+                    android:contentDescription="Piede destro posteriore" android:tag="foot_right"
+                    android:clickable="true" android:focusable="true"
+                    app:layout_constraintTop_toBottomOf="@id/back_lower_leg_right"
+                    app:layout_constraintStart_toStartOf="@id/back_lower_leg_right"
+                    android:layout_marginTop="-2dp"
+                    android:layout_marginStart="20dp" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </FrameLayout>
+    </ScrollView>
 
     <TextView
         android:id="@+id/tvSelezione"
