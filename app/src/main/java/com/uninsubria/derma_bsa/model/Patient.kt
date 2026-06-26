@@ -3,6 +3,15 @@ package com.uninsubria.derma_bsa.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+/**
+ * Entità Room che rappresenta un paziente registrato nell'applicazione.
+ *
+ * @property id chiave primaria generata automaticamente dal database
+ * @property nome nome del paziente
+ * @property cognome cognome del paziente
+ * @property etaAnni età rappresentativa della fascia d'età (2, 7, 12 o 20 anni)
+ * @property dataCreazione timestamp di creazione del record in millisecondi
+ */
 @Entity(tableName = "pazienti")
 data class Patient(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

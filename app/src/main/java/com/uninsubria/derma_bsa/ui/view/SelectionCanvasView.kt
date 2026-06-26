@@ -135,6 +135,7 @@ class SelectionCanvasView @JvmOverloads constructor(
         }
     }
 
+    /** Disegna o cancella sulla maschera seguendo il tratto del dito. */
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x
         val y = event.y
@@ -169,6 +170,7 @@ class SelectionCanvasView @JvmOverloads constructor(
     // Logica maschera
     // ─────────────────────────────────────────────────────────────────────────
 
+    /** Controlla se l'utente ha dipinto almeno un pixel sulla maschera. */
     fun hasSelection(): Boolean {
         val bmp = maskBitmap ?: return false
         for (row in 0 until bmp.height step 4)
@@ -200,6 +202,7 @@ class SelectionCanvasView @JvmOverloads constructor(
         return Bitmap.createScaledBitmap(cropped, imgW, imgH, true)
     }
 
+    /** Cancella tutta la selezione dipinta finora. */
     fun clearSelection() {
         maskCanvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         invalidate()

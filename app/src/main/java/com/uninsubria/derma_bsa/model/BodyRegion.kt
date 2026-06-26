@@ -1,5 +1,8 @@
 package com.uninsubria.derma_bsa.model
 
+/**
+ * Le quattro macro-aree del sistema PASI con il rispettivo peso sul punteggio totale.
+ */
 enum class PasiRegion(val label: String, val peso: Float) {
     TESTA("Testa", 0.1f),
     ARTI_SUPERIORI("Arti superiori", 0.2f),
@@ -7,6 +10,14 @@ enum class PasiRegion(val label: String, val peso: Float) {
     ARTI_INFERIORI("Arti inferiori", 0.4f)
 }
 
+/**
+ * Distretto anatomico con la sua percentuale BSA e la macro-area PASI di appartenenza.
+ *
+ * @property id identificatore del distretto usato internamente
+ * @property label nome visualizzato in UI
+ * @property bsaPercent percentuale BSA del distretto, dipende dall'età del paziente
+ * @property pasiRegion macro-area PASI a cui appartiene
+ */
 data class BodyRegion(
     val id: String,
     val label: String,

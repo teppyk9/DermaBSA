@@ -160,6 +160,7 @@ class CropOverlayView @JvmOverloads constructor(
         }
     }
 
+    /** Gestisce pan con un dito e zoom+rotazione con due dita sulla silhouette. */
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {

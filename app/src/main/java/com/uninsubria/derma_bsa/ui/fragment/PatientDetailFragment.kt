@@ -143,6 +143,14 @@ class PatientDetailFragment : Fragment() {
         private const val ARG_COGNOME = "cognome"
         private const val ARG_ETA_ANNI = "eta_anni"
 
+        /**
+         * Crea il fragment con i dati del paziente passati come argomenti.
+         *
+         * @param patientId id del paziente nel database
+         * @param nome nome del paziente
+         * @param cognome cognome del paziente
+         * @param etaAnni età rappresentativa della fascia d'età
+         */
         fun newInstance(patientId: Long, nome: String, cognome: String, etaAnni: Long = 0L) =
             PatientDetailFragment().apply {
                 arguments = Bundle().apply {

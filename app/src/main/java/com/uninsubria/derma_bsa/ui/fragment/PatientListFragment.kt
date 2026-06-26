@@ -23,6 +23,11 @@ import com.uninsubria.derma_bsa.model.PatientConBsa
 import com.uninsubria.derma_bsa.ui.adapter.PatientAdapter
 import kotlinx.coroutines.launch
 
+/**
+ * Schermata principale con la lista dei pazienti salvati.
+ * Ogni riga mostra nome, cognome e BSA dell'ultima sessione.
+ * Dal pulsante in basso si crea un nuovo paziente e si avvia la misurazione.
+ */
 class PatientListFragment : Fragment() {
 
     private var _binding: FragmentPatientListBinding? = null
@@ -55,6 +60,7 @@ class PatientListFragment : Fragment() {
         binding.btnNuovaSessione.setOnClickListener { mostraDialogoNuovoPaziente() }
     }
 
+    /** Apre il dialogo di creazione paziente e naviga alla mappa corporea. */
     private fun mostraDialogoNuovoPaziente() {
         val padding = (16 * resources.displayMetrics.density).toInt()
 
@@ -108,6 +114,11 @@ class PatientListFragment : Fragment() {
             .show()
     }
 
+    /**
+     * Apre [PatientDetailFragment] per il paziente selezionato dalla lista.
+     *
+     * @param paziente il paziente su cui è stato fatto tap
+     */
     private fun apriDettaglio(paziente: PatientConBsa) {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, PatientDetailFragment.newInstance(
@@ -117,6 +128,7 @@ class PatientListFragment : Fragment() {
             .commit()
     }
 
+    /** Naviga a [BodyMapFragment] per avviare la selezione della regione corporea. */
     private fun avviaBodyMap() {
         parentFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, BodyMapFragment())

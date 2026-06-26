@@ -12,6 +12,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
     version = 4,
     exportSchema = false
 )
+/**
+ * Database Room dell'app (versione 4) con le tabelle pazienti, sessioni e misure.
+ * Usa il pattern singleton tramite [getInstance].
+ */
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun patientDao(): PatientDao
@@ -64,6 +68,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /** Ritorna l'istanza singleton del database, creandola se non esiste ancora. */
         fun getInstance(context: Context): AppDatabase =
             INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
