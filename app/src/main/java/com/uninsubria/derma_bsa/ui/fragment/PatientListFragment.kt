@@ -83,7 +83,7 @@ class PatientListFragment : Fragment() {
                 android.R.layout.simple_spinner_dropdown_item,
                 fasce
             )
-            setSelection(3) // default: 15+ anni
+            setSelection(3)
         }
 
         layout.addView(etNome)

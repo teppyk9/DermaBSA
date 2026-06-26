@@ -222,7 +222,6 @@ class CropOverlayView @JvmOverloads constructor(
         val bmp = overlayBitmap ?: return null
         if (imageRect.isEmpty) return null
 
-        // Matrice da view a image
         val imageToView = Matrix().apply {
             setRectToRect(
                 RectF(0f, 0f, img.width.toFloat(), img.height.toFloat()),
@@ -232,11 +231,8 @@ class CropOverlayView @JvmOverloads constructor(
         }
         val viewToImage = Matrix().also { imageToView.invert(it) }
 
-        // overlayMatrix: bitmap coords → view coords
-        // bmpToImage: bitmap coords → image coords
         val bmpToImage = Matrix(overlayMatrix).apply { postConcat(viewToImage) }
 
-        // Bounding box dei 4 angoli del bitmap nel sistema immagine
         val corners = floatArrayOf(
             0f, 0f,
             bmp.width.toFloat(), 0f,
@@ -262,21 +258,18 @@ class CropOverlayView @JvmOverloads constructor(
         val cropW = clipped.width().toInt().coerceAtLeast(1)
         val cropH = clipped.height().toInt().coerceAtLeast(1)
 
-        // 1. Ritaglia la foto nella bounding box della sagoma
         val photoCrop = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
         Canvas(photoCrop).apply {
             translate(-clipped.left, -clipped.top)
             drawBitmap(img, 0f, 0f, null)
         }
 
-        // 2. Disegna la sagoma trasformata nel sistema delle coordinate del crop
         val maskBmp = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
         val maskMatrix = Matrix(bmpToImage).apply {
             postTranslate(-clipped.left, -clipped.top)
         }
         Canvas(maskBmp).drawBitmap(bmp, maskMatrix, Paint(Paint.ANTI_ALIAS_FLAG))
 
-        // 3. Applica la maschera alpha alla foto (DST_IN)
         val result = Bitmap.createBitmap(cropW, cropH, Bitmap.Config.ARGB_8888)
         val resultCanvas = Canvas(result)
         resultCanvas.drawBitmap(photoCrop, 0f, 0f, null)

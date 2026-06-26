@@ -44,17 +44,13 @@ class BodyMapFragment : Fragment() {
 
         val regions = viewModel.regionsPerPazienteCorrente()
 
-        // Registra i click su tutti gli ImageView del pannello fronte
         registraClick(binding.bodyFront, isFrontPanel = true, regions)
-
-        // Registra i click su tutti gli ImageView del pannello retro
         registraClick(binding.bodyBack, isFrontPanel = false, regions)
 
         binding.toggleVista.setOnCheckedChangeListener { _, checkedId ->
             isFront = (checkedId == R.id.rbFronte)
             binding.bodyFront.visibility = if (isFront) View.VISIBLE else View.GONE
             binding.bodyBack.visibility  = if (isFront) View.GONE  else View.VISIBLE
-            // Deseleziona quando si cambia lato
             clearSelection()
         }
 
@@ -110,10 +106,7 @@ class BodyMapFragment : Fragment() {
     }
 
     private fun selezionaDistretto(imageView: ImageView, region: BodyRegion) {
-        // Rimuove evidenziazione precedente
         selectedView?.clearColorFilter()
-
-        // Applica tint di selezione
         imageView.setColorFilter(Color.argb(160, 16, 95, 104), PorterDuff.Mode.SRC_ATOP)
         selectedView = imageView
         selezione = region

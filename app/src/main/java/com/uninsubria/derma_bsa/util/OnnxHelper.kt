@@ -89,7 +89,6 @@ object OnnxHelper {
         tensor.close()
         output.close()
 
-        // Calcola i valori sigmoid per tutti i pixel prima di applicare la soglia
         val sigmoidValues = FloatArray(size * size) { i -> sigmoid(raw[i / size][i % size]) }
         val threshold = adaptiveThreshold(sigmoidValues)
 
@@ -128,7 +127,6 @@ object OnnxHelper {
         val maskPx = IntArray(w * h)
         scaledMask.getPixels(maskPx, 0, w, 0, 0, w, h)
 
-        // Trova il bounding box minimo della selezione dell'utente
         var minX = w; var maxX = 0
         var minY = h; var maxY = 0
         for (y in 0 until h) {
@@ -142,20 +140,17 @@ object OnnxHelper {
             }
         }
 
-        // Nessun pixel selezionato: analisi su tutta l'immagine come fallback
         if (minX > maxX || minY > maxY) return segment(bitmap)
 
         val bboxW = maxX - minX + 1
         val bboxH = maxY - minY + 1
 
-        // Applica la maschera all'immagine sorgente: pixel fuori selezione → nero
         val srcPx = IntArray(w * h)
         bitmap.getPixels(srcPx, 0, w, 0, 0, w, h)
         for (i in maskPx.indices) {
             if ((maskPx[i] ushr 24) == 0) srcPx[i] = 0xFF000000.toInt()
         }
 
-        // Estrai solo la regione del bounding box
         val bboxPx = IntArray(bboxW * bboxH)
         for (y in 0 until bboxH)
             for (x in 0 until bboxW)
@@ -164,12 +159,10 @@ object OnnxHelper {
         val bboxBitmap = Bitmap.createBitmap(bboxW, bboxH, Bitmap.Config.ARGB_8888)
         bboxBitmap.setPixels(bboxPx, 0, bboxW, 0, 0, bboxW, bboxH)
 
-        // Inferenza: il modello vede 512×512 tutti dedicati alla zona di interesse
         val bboxMask = segment(bboxBitmap)
 
-        // Riproietta il risultato nelle coordinate dell'immagine originale
         val scaledResult = Bitmap.createScaledBitmap(bboxMask, bboxW, bboxH, false)
-        val fullMask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)  // tutto trasparente
+        val fullMask = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         Canvas(fullMask).drawBitmap(scaledResult, minX.toFloat(), minY.toFloat(), null)
 
         return fullMask
@@ -243,8 +236,6 @@ object OnnxHelper {
             }
         }
 
-        // Soglia libera tra 0.2 e 0.4: range volutamente più basso di 0.5
-        // per catturare anche alterazioni cromatiche tenui
         return bestThreshold.coerceIn(0.2f, 0.4f)
     }
 }

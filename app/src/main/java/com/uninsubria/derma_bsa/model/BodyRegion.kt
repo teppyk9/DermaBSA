@@ -25,11 +25,10 @@ data class BodyRegion(
     val pasiRegion: PasiRegion
 )
 
-// Pesi proporzionali da adult_back_front_percentage
-private val HEAD_W  = floatArrayOf(3.5f, 3.5f, 1.0f, 1.0f)           // head_f, head_b, neck_f, neck_b
-private val TRUNK_W = floatArrayOf(16.5f, 13.0f, 1.0f, 2.5f, 2.5f)   // torso_f, torso_b, groin, glut_l, glut_r
-private val ARM_W   = floatArrayOf(2.0f, 2.0f, 1.5f, 1.5f, 1.25f, 1.25f) // ua_f, ua_b, fa_f, fa_b, h_f, h_b
-private val LEG_W   = floatArrayOf(4.5f, 4.5f, 4.0f, 4.0f, 1.5f, 1.5f)  // th_f, th_b, ll_f, ll_b, ft_f, ft_b
+private val HEAD_W  = floatArrayOf(3.5f, 3.5f, 1.0f, 1.0f)
+private val TRUNK_W = floatArrayOf(16.5f, 13.0f, 1.0f, 2.5f, 2.5f)
+private val ARM_W   = floatArrayOf(2.0f, 2.0f, 1.5f, 1.5f, 1.25f, 1.25f)
+private val LEG_W   = floatArrayOf(4.5f, 4.5f, 4.0f, 4.0f, 1.5f, 1.5f)
 
 private fun FloatArray.scaleTo(total: Float): FloatArray {
     val s = sum()

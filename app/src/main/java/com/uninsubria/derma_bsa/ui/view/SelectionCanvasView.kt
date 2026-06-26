@@ -34,18 +34,15 @@ class SelectionCanvasView @JvmOverloads constructor(
             cursorOuterPaint.strokeWidth = value.coerceAtLeast(6f) * 0.12f + 4f
         }
 
-    // ── Bitmap maschera ──────────────────────────────────────────────────────
     private var maskBitmap: Bitmap? = null
     private var maskCanvas: Canvas? = null
 
-    // ── Info sull'immagine mostrata nell'ImageView sottostante ────────────────
     private var imgW = 0
     private var imgH = 0
-    private val imageRect = RectF()   // dove fitCenter posiziona la foto nella view
+    private val imageRect = RectF()
 
-    // ── Paint per il disegno sulla maschera ──────────────────────────────────
     private val brushPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0x99FF6600.toInt()    // arancione ~60% opaco
+        color = 0x99FF6600.toInt()
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
@@ -57,11 +54,10 @@ class SelectionCanvasView @JvmOverloads constructor(
         strokeJoin = Paint.Join.ROUND
     }
 
-    // ── Paint cursore ─────────────────────────────────────────────────────────
     private val cursorOuterPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeWidth = 6f
-        color = 0xCC000000.toInt()    // anello scuro per contrasto
+        color = 0xCC000000.toInt()
     }
     private val cursorInnerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -69,7 +65,6 @@ class SelectionCanvasView @JvmOverloads constructor(
         color = Color.WHITE
     }
 
-    // ── Stato cursore ─────────────────────────────────────────────────────────
     private var cursorX = 0f
     private var cursorY = 0f
     private var cursorVisible = false
@@ -79,13 +74,8 @@ class SelectionCanvasView @JvmOverloads constructor(
         invalidate()
     }
 
-    // ── Tratto precedente ─────────────────────────────────────────────────────
     private var lastX = 0f
     private var lastY = 0f
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // API pubblica
-    // ─────────────────────────────────────────────────────────────────────────
 
     /**
      * Registra le dimensioni del bitmap mostrato dall'ImageView affiancato,
@@ -111,13 +101,8 @@ class SelectionCanvasView @JvmOverloads constructor(
         postDelayed(hideCursorRunnable, 1500)
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Lifecycle
-    // ─────────────────────────────────────────────────────────────────────────
-
     override fun onSizeChanged(w: Int, h: Int, oldW: Int, oldH: Int) {
         super.onSizeChanged(w, h, oldW, oldH)
-        // Ricrea la bitmap maschera alle nuove dimensioni della view, preservando il contenuto.
         val old = maskBitmap
         maskBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         maskCanvas = Canvas(maskBitmap!!)
@@ -166,10 +151,6 @@ class SelectionCanvasView @JvmOverloads constructor(
         return true
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Logica maschera
-    // ─────────────────────────────────────────────────────────────────────────
-
     /** Controlla se l'utente ha dipinto almeno un pixel sulla maschera. */
     fun hasSelection(): Boolean {
         val bmp = maskBitmap ?: return false
@@ -188,7 +169,6 @@ class SelectionCanvasView @JvmOverloads constructor(
         if (!hasSelection()) return null
         val bmp = maskBitmap ?: return null
 
-        // Se non abbiamo ancora le info sull'immagine, restituiamo la maschera grezza.
         if (imgW <= 0 || imageRect.isEmpty) return bmp.copy(Bitmap.Config.ARGB_8888, false)
 
         val srcL = imageRect.left.toInt().coerceAtLeast(0)
@@ -207,10 +187,6 @@ class SelectionCanvasView @JvmOverloads constructor(
         maskCanvas?.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
         invalidate()
     }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Utility privata
-    // ─────────────────────────────────────────────────────────────────────────
 
     /** Calcola dove l'ImageView fitCenter posiziona la foto all'interno di questa view. */
     private fun computeImageRect() {
