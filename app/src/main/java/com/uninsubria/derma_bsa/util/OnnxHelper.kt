@@ -195,11 +195,11 @@ object OnnxHelper {
      *
      * Otsu trova la soglia che minimizza la varianza intra-classe tra i due gruppi
      * (sfondo e lesione), cercando la separazione ottimale nella distribuzione
-     * dei valori di confidenza. Il floor a 0.5 evita falsi positivi quando
-     * il modello è incerto (distribuzione piatta o sbilanciata verso lo sfondo).
+     * dei valori di confidenza. Il risultato viene bloccato nell'intervallo [0.2, 0.4]
+     * per evitare falsi negativi su lesioni a basso contrasto cromatico.
      *
      * @param values array di valori sigmoid in [0, 1], uno per pixel
-     * @return soglia in [0.5, 1.0]
+     * @return soglia in [0.2, 0.4]
      */
     private fun adaptiveThreshold(values: FloatArray, numBins: Int = 256): Float {
         val hist = IntArray(numBins)
@@ -215,7 +215,7 @@ object OnnxHelper {
         var sumBackground = 0f
         var countBackground = 0
         var bestVariance = 0f
-        var bestThreshold = 0.5f
+        var bestThreshold = 0.3f
 
         for (t in hist.indices) {
             countBackground += hist[t]
